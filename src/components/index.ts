@@ -12,8 +12,16 @@ export { BatchTaskCreator } from './BatchTaskCreator';
 export { TaskList } from './TaskList';
 export { TaskOrganizer } from './TaskOrganizer';
 export { RecoveryDialog } from './RecoveryDialog';
-export { ProgressBar, AreaProgressBar, MilestoneProgressBar } from './ProgressBar';
-export { TaskStatusIndicator, TaskStatusDot, TaskStatusBadge } from './TaskStatusIndicator';
+export {
+  ProgressBar,
+  AreaProgressBar,
+  MilestoneProgressBar,
+} from './ProgressBar';
+export {
+  TaskStatusIndicator,
+  TaskStatusDot,
+  TaskStatusBadge,
+} from './TaskStatusIndicator';
 export { StatisticsDashboard } from './StatisticsDashboard';
 export { CelebrationModal, AchievementBadge } from './CelebrationModal';
 export { default as ExportModal } from './ExportModal';

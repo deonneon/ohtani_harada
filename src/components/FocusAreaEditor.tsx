@@ -23,16 +23,18 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
   focusAreas,
   goalId,
   onSave,
-  onClose
+  onClose,
 }) => {
   const [areas, setAreas] = useState<CreateFocusAreaInput[]>([]);
-  const [errors, setErrors] = useState<Record<number, {title?: string; description?: string}>>({});
+  const [errors, setErrors] = useState<
+    Record<number, { title?: string; description?: string }>
+  >({});
 
   // Auto-save functionality
   const autoSave = useAutoSave(areas, {
     storageKey: `focus-areas-editor-${goalId}`,
     delay: 2000, // Save after 2 seconds of inactivity
-    enabled: isOpen
+    enabled: isOpen,
   });
   const { saveStatus, saveStatusText } = useAutoSaveIndicator(autoSave);
 
@@ -46,40 +48,49 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
         setAreas(savedData);
       } else if (focusAreas.length === 8) {
         // Existing areas - convert to input format
-        setAreas(focusAreas.map(area => ({
-          title: area.title,
-          description: area.description
-        })));
+        setAreas(
+          focusAreas.map((area) => ({
+            title: area.title,
+            description: area.description,
+          }))
+        );
       } else {
         // Create empty areas (should be 8 total)
-        setAreas(Array.from({ length: 8 }, () => ({ title: '', description: '' })));
+        setAreas(
+          Array.from({ length: 8 }, () => ({ title: '', description: '' }))
+        );
       }
       setErrors({});
     }
   }, [isOpen, focusAreas, autoSave.savedData]);
 
   // Update a specific area's field
-  const updateArea = (index: number, field: 'title' | 'description', value: string) => {
-    setAreas(prev => prev.map((area, i) =>
-      i === index ? { ...area, [field]: value } : area
-    ));
+  const updateArea = (
+    index: number,
+    field: 'title' | 'description',
+    value: string
+  ) => {
+    setAreas((prev) =>
+      prev.map((area, i) => (i === index ? { ...area, [field]: value } : area))
+    );
 
     // Clear error for this field when user starts typing
     if (errors[index]?.[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [index]: { ...prev[index], [field]: undefined }
+        [index]: { ...prev[index], [field]: undefined },
       }));
     }
   };
 
   // Validate all areas
   const validateAreas = (): boolean => {
-    const newErrors: Record<number, {title?: string; description?: string}> = {};
+    const newErrors: Record<number, { title?: string; description?: string }> =
+      {};
     let isValid = true;
 
     areas.forEach((area, index) => {
-      const areaErrors: {title?: string; description?: string} = {};
+      const areaErrors: { title?: string; description?: string } = {};
 
       if (!area.title.trim()) {
         areaErrors.title = 'Focus area title is required';
@@ -150,7 +161,9 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Define Your Focus Areas</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Define Your Focus Areas
+          </h2>
           <p className="text-sm text-gray-600 mt-1">
             The 8 areas that support your central goal
           </p>
@@ -160,8 +173,18 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
           className="text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Close editor"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -175,45 +198,96 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
           </h3>
           <div className="space-y-3 text-sm text-green-800">
             <p>
-              <strong>Like Shohei Ohtani's approach:</strong> Instead of just "training harder," Ohtani broke down
-              his development into 8 specialized areas: Physical Conditioning, Mental Preparation, Hitting Mechanics,
-              Pitching Technique, Game Strategy, Recovery Systems, Nutrition, and Injury Prevention.
+              <strong>Like Shohei Ohtani's approach:</strong> Instead of just
+              "training harder," Ohtani broke down his development into 8
+              specialized areas: Physical Conditioning, Mental Preparation,
+              Hitting Mechanics, Pitching Technique, Game Strategy, Recovery
+              Systems, Nutrition, and Injury Prevention.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h4 className="font-medium mb-2">🏆 Sports Example:</h4>
                 <ul className="text-xs space-y-1">
-                  <li>• <strong>Physical Conditioning</strong> - Strength, speed, endurance</li>
-                  <li>• <strong>Mental Preparation</strong> - Focus, visualization, resilience</li>
-                  <li>• <strong>Skill Development</strong> - Technique, form, precision</li>
-                  <li>• <strong>Strategy & Tactics</strong> - Game planning, decision making</li>
-                  <li>• <strong>Recovery & Health</strong> - Rest, nutrition, injury prevention</li>
-                  <li>• <strong>Equipment & Tools</strong> - Gear, training aids, technology</li>
-                  <li>• <strong>Support Network</strong> - Coaches, teammates, mentors</li>
-                  <li>• <strong>Measurement & Analysis</strong> - Tracking progress, data analysis</li>
+                  <li>
+                    • <strong>Physical Conditioning</strong> - Strength, speed,
+                    endurance
+                  </li>
+                  <li>
+                    • <strong>Mental Preparation</strong> - Focus,
+                    visualization, resilience
+                  </li>
+                  <li>
+                    • <strong>Skill Development</strong> - Technique, form,
+                    precision
+                  </li>
+                  <li>
+                    • <strong>Strategy & Tactics</strong> - Game planning,
+                    decision making
+                  </li>
+                  <li>
+                    • <strong>Recovery & Health</strong> - Rest, nutrition,
+                    injury prevention
+                  </li>
+                  <li>
+                    • <strong>Equipment & Tools</strong> - Gear, training aids,
+                    technology
+                  </li>
+                  <li>
+                    • <strong>Support Network</strong> - Coaches, teammates,
+                    mentors
+                  </li>
+                  <li>
+                    • <strong>Measurement & Analysis</strong> - Tracking
+                    progress, data analysis
+                  </li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-medium mb-2">💼 Career Example:</h4>
                 <ul className="text-xs space-y-1">
-                  <li>• <strong>Technical Skills</strong> - Core competencies, tools</li>
-                  <li>• <strong>Soft Skills</strong> - Communication, leadership, networking</li>
-                  <li>• <strong>Industry Knowledge</strong> - Trends, best practices, standards</li>
-                  <li>• <strong>Project Management</strong> - Planning, execution, delivery</li>
-                  <li>• <strong>Work-Life Balance</strong> - Health, relationships, personal growth</li>
-                  <li>• <strong>Financial Management</strong> - Budgeting, investing, planning</li>
-                  <li>• <strong>Professional Development</strong> - Learning, certifications, mentoring</li>
-                  <li>• <strong>Personal Branding</strong> - Online presence, reputation, visibility</li>
+                  <li>
+                    • <strong>Technical Skills</strong> - Core competencies,
+                    tools
+                  </li>
+                  <li>
+                    • <strong>Soft Skills</strong> - Communication, leadership,
+                    networking
+                  </li>
+                  <li>
+                    • <strong>Industry Knowledge</strong> - Trends, best
+                    practices, standards
+                  </li>
+                  <li>
+                    • <strong>Project Management</strong> - Planning, execution,
+                    delivery
+                  </li>
+                  <li>
+                    • <strong>Work-Life Balance</strong> - Health,
+                    relationships, personal growth
+                  </li>
+                  <li>
+                    • <strong>Financial Management</strong> - Budgeting,
+                    investing, planning
+                  </li>
+                  <li>
+                    • <strong>Professional Development</strong> - Learning,
+                    certifications, mentoring
+                  </li>
+                  <li>
+                    • <strong>Personal Branding</strong> - Online presence,
+                    reputation, visibility
+                  </li>
                 </ul>
               </div>
             </div>
 
             <div className="bg-green-100 p-3 rounded border-l-4 border-green-600">
               <p className="text-xs">
-                <strong>Key Insight:</strong> Each focus area becomes a "lane" in your 64-task matrix.
-                The goal of the Harada Method is systematic development across all areas simultaneously,
-                creating compound growth that leads to extraordinary results.
+                <strong>Key Insight:</strong> Each focus area becomes a "lane"
+                in your 64-task matrix. The goal of the Harada Method is
+                systematic development across all areas simultaneously, creating
+                compound growth that leads to extraordinary results.
               </p>
             </div>
           </div>
@@ -246,15 +320,23 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
                   value={area.title}
                   onChange={(e) => updateArea(index, 'title', e.target.value)}
                   className={`w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 ${
-                    errors[index]?.title ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                    errors[index]?.title
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
                   }`}
                   placeholder={`e.g., Physical Conditioning`}
                   maxLength={50}
-                  aria-describedby={errors[index]?.title ? `title-error-${index}` : undefined}
+                  aria-describedby={
+                    errors[index]?.title ? `title-error-${index}` : undefined
+                  }
                   aria-invalid={!!errors[index]?.title}
                 />
                 {errors[index]?.title && (
-                  <p id={`title-error-${index}`} className="mt-1 text-xs text-red-600" role="alert">
+                  <p
+                    id={`title-error-${index}`}
+                    className="mt-1 text-xs text-red-600"
+                    role="alert"
+                  >
                     {errors[index]?.title}
                   </p>
                 )}
@@ -274,18 +356,30 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
                 <textarea
                   id={`area-description-${index}`}
                   value={area.description}
-                  onChange={(e) => updateArea(index, 'description', e.target.value)}
+                  onChange={(e) =>
+                    updateArea(index, 'description', e.target.value)
+                  }
                   rows={3}
                   className={`w-full px-2 py-1 text-sm border rounded resize-none focus:outline-none focus:ring-1 ${
-                    errors[index]?.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                    errors[index]?.description
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
                   }`}
                   placeholder="Describe what this focus area entails and how it supports your goal..."
                   maxLength={200}
-                  aria-describedby={errors[index]?.description ? `description-error-${index}` : undefined}
+                  aria-describedby={
+                    errors[index]?.description
+                      ? `description-error-${index}`
+                      : undefined
+                  }
                   aria-invalid={!!errors[index]?.description}
                 />
                 {errors[index]?.description && (
-                  <p id={`description-error-${index}`} className="mt-1 text-xs text-red-600" role="alert">
+                  <p
+                    id={`description-error-${index}`}
+                    className="mt-1 text-xs text-red-600"
+                    role="alert"
+                  >
                     {errors[index]?.description}
                   </p>
                 )}
@@ -311,23 +405,42 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
             )}
             {saveStatus === 'saved' && (
               <div className="flex items-center gap-2 text-green-600">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <span>{saveStatusText}</span>
               </div>
             )}
             {saveStatus === 'unsaved' && autoSave.savedData && (
               <div className="flex items-center gap-2 text-orange-600">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <span>Draft available</span>
               </div>
             )}
           </div>
           <div className="text-sm text-gray-600">
-            <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl</kbd> + <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Enter</kbd> to save
+            <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl</kbd>{' '}
+            +{' '}
+            <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Enter</kbd>{' '}
+            to save
           </div>
         </div>
         <div className="flex gap-3">

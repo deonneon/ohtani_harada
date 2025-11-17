@@ -14,9 +14,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import {
-  useSortable,
-} from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task, TaskStatus, TaskPriority } from '../types';
 
@@ -85,7 +83,7 @@ const SortableTaskItem: React.FC<{
       {dragEnabled && (
         <div className="flex-shrink-0 text-gray-400 hover:text-gray-600">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M3 4h14a1 1 0 010 2H3a1 1 0 010-2zM3 8h14a1 1 0 010 2H3a1 1 0 010-2zM3 12h14a1 1 0 010 2H3a1 1 0 010-2z"/>
+            <path d="M3 4h14a1 1 0 010 2H3a1 1 0 010-2zM3 8h14a1 1 0 010 2H3a1 1 0 010-2zM3 12h14a1 1 0 010 2H3a1 1 0 010-2z" />
           </svg>
         </div>
       )}
@@ -130,7 +128,7 @@ export const TaskList: React.FC<TaskListProps> = ({
   areaId,
   onReorder,
   onTaskClick,
-  dragEnabled = true
+  dragEnabled = true,
 }) => {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -153,8 +151,14 @@ export const TaskList: React.FC<TaskListProps> = ({
 
   if (tasks.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500" role="status" aria-live="polite">
-        <div className="text-4xl mb-2" aria-hidden="true">📝</div>
+      <div
+        className="text-center py-8 text-gray-500"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="text-4xl mb-2" aria-hidden="true">
+          📝
+        </div>
         <p>No tasks yet. Click "Create Task" to add your first task!</p>
       </div>
     );
@@ -181,7 +185,10 @@ export const TaskList: React.FC<TaskListProps> = ({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={tasks.map((t) => t.id)}
+        strategy={verticalListSortingStrategy}
+      >
         <div className="space-y-2">
           {tasks.map((task) => (
             <SortableTaskItem

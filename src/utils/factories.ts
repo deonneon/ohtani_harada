@@ -1,4 +1,14 @@
-import { Goal, FocusArea, Task, MatrixData, TaskStatus, TaskPriority, CreateGoalInput, CreateFocusAreaInput, CreateTaskInput } from './types';
+import {
+  Goal,
+  FocusArea,
+  Task,
+  MatrixData,
+  TaskStatus,
+  TaskPriority,
+  CreateGoalInput,
+  CreateFocusAreaInput,
+  CreateTaskInput,
+} from './types';
 
 /**
  * Generates a unique ID for entities
@@ -16,7 +26,7 @@ export function createGoal(input: CreateGoalInput): Goal {
     id: generateId(),
     title: input.title,
     description: input.description,
-    createdDate: new Date()
+    createdDate: new Date(),
   };
 }
 
@@ -28,7 +38,7 @@ export function createFocusArea(input: CreateFocusAreaInput): FocusArea {
     id: generateId(),
     title: input.title,
     description: input.description,
-    goalId: input.goalId
+    goalId: input.goalId,
   };
 }
 
@@ -42,7 +52,7 @@ export function createTask(input: CreateTaskInput): Task {
     description: input.description,
     areaId: input.areaId,
     status: input.status,
-    priority: input.priority || TaskPriority.MEDIUM
+    priority: input.priority || TaskPriority.MEDIUM,
   };
 }
 
@@ -60,14 +70,16 @@ export function createFocusAreas(goalId: string): FocusArea[] {
     'Performance Execution',
     'Recovery & Maintenance',
     'Relationship Building',
-    'Personal Growth'
+    'Personal Growth',
   ];
 
-  return defaultAreaTitles.map(title => createFocusArea({
-    title,
-    description: `Focus area for ${title.toLowerCase()}`,
-    goalId
-  }));
+  return defaultAreaTitles.map((title) =>
+    createFocusArea({
+      title,
+      description: `Focus area for ${title.toLowerCase()}`,
+      goalId,
+    })
+  );
 }
 
 /**
@@ -77,15 +89,17 @@ export function createFocusAreas(goalId: string): FocusArea[] {
 export function createEmptyTaskMatrix(focusAreaIds: string[]): Task[] {
   const tasks: Task[] = [];
 
-  focusAreaIds.forEach(areaId => {
+  focusAreaIds.forEach((areaId) => {
     // Create 8 tasks per focus area
     for (let i = 1; i <= 8; i++) {
-      tasks.push(createTask({
-        title: `Task ${i}`,
-        description: `Task ${i} for focus area`,
-        areaId,
-        status: TaskStatus.PENDING
-      }));
+      tasks.push(
+        createTask({
+          title: `Task ${i}`,
+          description: `Task ${i} for focus area`,
+          areaId,
+          status: TaskStatus.PENDING,
+        })
+      );
     }
   });
 
@@ -104,13 +118,13 @@ export function createEmptyMatrix(goalInput: CreateGoalInput): MatrixData {
   const focusAreas = createFocusAreas(goal.id);
 
   // Create 64 empty tasks (8 per focus area)
-  const focusAreaIds = focusAreas.map(area => area.id);
+  const focusAreaIds = focusAreas.map((area) => area.id);
   const tasks = createEmptyTaskMatrix(focusAreaIds);
 
   return {
     goal,
     focusAreas,
-    tasks
+    tasks,
   };
 }
 
@@ -123,18 +137,18 @@ export function createMinimalMatrix(goalInput: CreateGoalInput): MatrixData {
   const focusAreas = createFocusAreas(goal.id);
 
   // Create just 1 task per focus area for minimal testing
-  const tasks: Task[] = focusAreas.map(area =>
+  const tasks: Task[] = focusAreas.map((area) =>
     createTask({
       title: `Sample task for ${area.title}`,
       description: `A sample task to get started with ${area.title.toLowerCase()}`,
       areaId: area.id,
-      status: TaskStatus.PENDING
+      status: TaskStatus.PENDING,
     })
   );
 
   return {
     goal,
     focusAreas,
-    tasks
+    tasks,
   };
 }

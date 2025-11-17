@@ -39,12 +39,16 @@ export class VersionUtils {
   /**
    * Parse version string into components
    */
-  static parse(version: Version): { major: number; minor: number; patch: number } {
+  static parse(version: Version): {
+    major: number;
+    minor: number;
+    patch: number;
+  } {
     const parts = version.split('.').map(Number);
     return {
       major: parts[0] || 0,
       minor: parts[1] || 0,
-      patch: parts[2] || 0
+      patch: parts[2] || 0,
     };
   }
 
@@ -101,7 +105,10 @@ export class MigrationEngine {
   /**
    * Get migration path from old version to new version
    */
-  private getMigrationPath(fromVersion: Version, toVersion: Version): Migration[] {
+  private getMigrationPath(
+    fromVersion: Version,
+    toVersion: Version
+  ): Migration[] {
     const path: Migration[] = [];
     let currentVersion = fromVersion;
 
@@ -113,7 +120,9 @@ export class MigrationEngine {
       const migration = this.migrations.get(key);
 
       if (!migration) {
-        throw new Error(`No migration found from ${currentVersion} to next version`);
+        throw new Error(
+          `No migration found from ${currentVersion} to next version`
+        );
       }
 
       path.push(migration);
@@ -147,7 +156,7 @@ export class MigrationEngine {
     const result: MigrationResult = {
       success: false,
       appliedMigrations: [],
-      errors: []
+      errors: [],
     };
 
     try {
@@ -161,7 +170,9 @@ export class MigrationEngine {
 
       // Cannot migrate to older versions
       if (VersionUtils.isGreaterThan(currentVersion, STORAGE_VERSION)) {
-        result.errors.push(`Data version ${currentVersion} is newer than supported version ${STORAGE_VERSION}`);
+        result.errors.push(
+          `Data version ${currentVersion} is newer than supported version ${STORAGE_VERSION}`
+        );
         return result;
       }
 
@@ -175,7 +186,9 @@ export class MigrationEngine {
           migratedData = migration.migrate(migratedData);
           result.appliedMigrations.push(migration);
         } catch (error) {
-          result.errors.push(`Migration ${migration.fromVersion}->${migration.toVersion} failed: ${error}`);
+          result.errors.push(
+            `Migration ${migration.fromVersion}->${migration.toVersion} failed: ${error}`
+          );
           return result;
         }
       }
@@ -187,7 +200,6 @@ export class MigrationEngine {
       result.success = true;
       result.migratedFrom = currentVersion;
       result.migratedTo = STORAGE_VERSION;
-
     } catch (error) {
       result.errors.push(`Migration failed: ${error}`);
     }
@@ -222,11 +234,11 @@ const exampleMigration: Migration = {
     // Add priority field to all tasks
     data.tasks = data.tasks.map((task: any) => ({
       ...task,
-      priority: task.priority || 'medium' // Default priority
+      priority: task.priority || 'medium', // Default priority
     }));
 
     return data;
-  }
+  },
 };
 
 // Register example migration (commented out since it's just an example)
@@ -262,7 +274,9 @@ export function getMigrationSummary(result: MigrationResult): string {
     return 'No migrations needed - data is up to date';
   }
 
-  const migrationDescriptions = result.appliedMigrations.map(m => m.description);
+  const migrationDescriptions = result.appliedMigrations.map(
+    (m) => m.description
+  );
   return `Successfully migrated from ${result.migratedFrom} to ${result.migratedTo}: ${migrationDescriptions.join(', ')}`;
 }
 
@@ -281,7 +295,11 @@ export function createBackwardCompatibilityLayer(data: any): MatrixData {
     throw new Error('Invalid data format');
   }
 
-  if (!data.goal || !Array.isArray(data.focusAreas) || !Array.isArray(data.tasks)) {
+  if (
+    !data.goal ||
+    !Array.isArray(data.focusAreas) ||
+    !Array.isArray(data.tasks)
+  ) {
     throw new Error('Missing required matrix data fields');
   }
 
@@ -294,14 +312,21 @@ export function createBackwardCompatibilityLayer(data: any): MatrixData {
  * Data schema validator for future versions
  * This ensures that data conforms to expected schema before migrations
  */
-export function validateDataSchema(data: any, expectedVersion: Version): boolean {
+export function validateDataSchema(
+  data: any,
+  expectedVersion: Version
+): boolean {
   // Basic schema validation
   if (!data || typeof data !== 'object') return false;
 
   // Version-specific validation could be added here
   switch (expectedVersion) {
     case '1.0.0':
-      return !!(data.goal && Array.isArray(data.focusAreas) && Array.isArray(data.tasks));
+      return !!(
+        data.goal &&
+        Array.isArray(data.focusAreas) &&
+        Array.isArray(data.tasks)
+      );
     default:
       return false;
   }
@@ -314,6 +339,6 @@ export function getMigrationMetadata() {
   return {
     currentVersion: STORAGE_VERSION,
     registeredMigrations: Array.from(migrationEngine['migrations'].keys()),
-    migrationCount: migrationEngine['migrations'].size
+    migrationCount: migrationEngine['migrations'].size,
   };
 }

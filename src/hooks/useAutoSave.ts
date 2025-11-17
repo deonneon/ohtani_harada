@@ -39,13 +39,7 @@ export function useAutoSave<T>(
   data: T,
   options: AutoSaveOptions
 ): UseAutoSaveReturn<T> {
-  const {
-    delay = 2000,
-    storageKey,
-    onSave,
-    onError,
-    enabled = true
-  } = options;
+  const { delay = 2000, storageKey, onSave, onError, enabled = true } = options;
 
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -72,27 +66,30 @@ export function useAutoSave<T>(
   }, [storageKey, onError]);
 
   // Auto-save function
-  const performSave = useCallback(async (dataToSave: T) => {
-    if (!enabled) return;
+  const performSave = useCallback(
+    async (dataToSave: T) => {
+      if (!enabled) return;
 
-    setIsSaving(true);
-    try {
-      const saveData = {
-        data: dataToSave,
-        timestamp: new Date().toISOString()
-      };
+      setIsSaving(true);
+      try {
+        const saveData = {
+          data: dataToSave,
+          timestamp: new Date().toISOString(),
+        };
 
-      localStorage.setItem(storageKey, JSON.stringify(saveData));
-      setSavedData(dataToSave);
-      setLastSaved(new Date());
-      onSave?.(dataToSave);
-    } catch (error) {
-      console.error('Auto-save failed:', error);
-      onError?.(error as Error);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [enabled, storageKey, onSave, onError]);
+        localStorage.setItem(storageKey, JSON.stringify(saveData));
+        setSavedData(dataToSave);
+        setLastSaved(new Date());
+        onSave?.(dataToSave);
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+        onError?.(error as Error);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [enabled, storageKey, onSave, onError]
+  );
 
   // Debounced save effect
   useEffect(() => {
@@ -151,7 +148,7 @@ export function useAutoSave<T>(
     isSaving,
     lastSaved,
     saveNow,
-    clearSaved
+    clearSaved,
   };
 }
 
@@ -178,7 +175,7 @@ export function useAutoSaveIndicator(autoSaveResult: UseAutoSaveReturn<any>) {
 
   return {
     saveStatus: getSaveStatus(),
-    saveStatusText: getSaveStatusText()
+    saveStatusText: getSaveStatusText(),
   };
 }
 

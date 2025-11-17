@@ -25,7 +25,7 @@ const Cell: React.FC<CellProps> = ({
   isSelected = false,
   onClick,
   className = '',
-  children
+  children,
 }) => {
   const baseClasses = `
     relative rounded-lg border-2 transition-all duration-300 ease-out

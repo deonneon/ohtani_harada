@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { MatrixData } from '../types';
-import { exportMatrix, ExportOptions, DEFAULT_EXPORT_OPTIONS } from '../utils/export';
+import {
+  exportMatrix,
+  ExportOptions,
+  DEFAULT_EXPORT_OPTIONS,
+} from '../utils/export';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -13,9 +17,11 @@ const ExportModal: React.FC<ExportModalProps> = ({
   isOpen,
   matrixData,
   gridElement,
-  onClose
+  onClose,
 }) => {
-  const [exportOptions, setExportOptions] = useState<ExportOptions>(DEFAULT_EXPORT_OPTIONS);
+  const [exportOptions, setExportOptions] = useState<ExportOptions>(
+    DEFAULT_EXPORT_OPTIONS
+  );
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,7 +48,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
     key: K,
     value: ExportOptions[K]
   ) => {
-    setExportOptions(prev => ({ ...prev, [key]: value }));
+    setExportOptions((prev) => ({ ...prev, [key]: value }));
   };
 
   if (!isOpen) return null;
@@ -60,7 +66,10 @@ const ExportModal: React.FC<ExportModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 id="export-modal-title" className="text-xl font-semibold text-gray-900">
+          <h2
+            id="export-modal-title"
+            className="text-xl font-semibold text-gray-900"
+          >
             Export Matrix
           </h2>
           <button
@@ -68,8 +77,18 @@ const ExportModal: React.FC<ExportModalProps> = ({
             className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Close export modal"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -93,10 +112,14 @@ const ExportModal: React.FC<ExportModalProps> = ({
                   name="format"
                   value="png"
                   checked={exportOptions.format === 'png'}
-                  onChange={(e) => updateOption('format', e.target.value as 'png')}
+                  onChange={(e) =>
+                    updateOption('format', e.target.value as 'png')
+                  }
                   className="text-blue-600 focus:ring-blue-500"
                 />
-                <span className="ml-2 text-sm text-gray-700">PNG Image (High Quality)</span>
+                <span className="ml-2 text-sm text-gray-700">
+                  PNG Image (High Quality)
+                </span>
               </label>
               <label className="flex items-center">
                 <input
@@ -104,10 +127,14 @@ const ExportModal: React.FC<ExportModalProps> = ({
                   name="format"
                   value="jpeg"
                   checked={exportOptions.format === 'jpeg'}
-                  onChange={(e) => updateOption('format', e.target.value as 'jpeg')}
+                  onChange={(e) =>
+                    updateOption('format', e.target.value as 'jpeg')
+                  }
                   className="text-blue-600 focus:ring-blue-500"
                 />
-                <span className="ml-2 text-sm text-gray-700">JPEG Image (Smaller File)</span>
+                <span className="ml-2 text-sm text-gray-700">
+                  JPEG Image (Smaller File)
+                </span>
               </label>
               <label className="flex items-center">
                 <input
@@ -115,10 +142,14 @@ const ExportModal: React.FC<ExportModalProps> = ({
                   name="format"
                   value="pdf"
                   checked={exportOptions.format === 'pdf'}
-                  onChange={(e) => updateOption('format', e.target.value as 'pdf')}
+                  onChange={(e) =>
+                    updateOption('format', e.target.value as 'pdf')
+                  }
                   className="text-blue-600 focus:ring-blue-500"
                 />
-                <span className="ml-2 text-sm text-gray-700">PDF Document (Detailed)</span>
+                <span className="ml-2 text-sm text-gray-700">
+                  PDF Document (Detailed)
+                </span>
               </label>
             </div>
           </div>
@@ -131,7 +162,12 @@ const ExportModal: React.FC<ExportModalProps> = ({
               </label>
               <select
                 value={exportOptions.contentType}
-                onChange={(e) => updateOption('contentType', e.target.value as 'full' | 'summary' | 'completed-only')}
+                onChange={(e) =>
+                  updateOption(
+                    'contentType',
+                    e.target.value as 'full' | 'summary' | 'completed-only'
+                  )
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="full">Full Matrix (All details)</option>
@@ -142,7 +178,8 @@ const ExportModal: React.FC<ExportModalProps> = ({
           )}
 
           {/* Quality Slider (Image formats only) */}
-          {(exportOptions.format === 'png' || exportOptions.format === 'jpeg') && (
+          {(exportOptions.format === 'png' ||
+            exportOptions.format === 'jpeg') && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Quality: {Math.round((exportOptions.quality || 0.95) * 100)}%
@@ -153,7 +190,9 @@ const ExportModal: React.FC<ExportModalProps> = ({
                 max="1"
                 step="0.05"
                 value={exportOptions.quality || 0.95}
-                onChange={(e) => updateOption('quality', parseFloat(e.target.value))}
+                onChange={(e) =>
+                  updateOption('quality', parseFloat(e.target.value))
+                }
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -164,7 +203,10 @@ const ExportModal: React.FC<ExportModalProps> = ({
 
           {/* Title */}
           <div>
-            <label htmlFor="export-title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="export-title"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Custom Title
             </label>
             <input
@@ -186,34 +228,55 @@ const ExportModal: React.FC<ExportModalProps> = ({
                 onChange={(e) => updateOption('includeTitle', e.target.checked)}
                 className="text-blue-600 focus:ring-blue-500 rounded"
               />
-              <span className="ml-2 text-sm text-gray-700">Include title and date</span>
+              <span className="ml-2 text-sm text-gray-700">
+                Include title and date
+              </span>
             </label>
 
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={exportOptions.includeFooter ?? true}
-                onChange={(e) => updateOption('includeFooter', e.target.checked)}
+                onChange={(e) =>
+                  updateOption('includeFooter', e.target.checked)
+                }
                 className="text-blue-600 focus:ring-blue-500 rounded"
               />
-              <span className="ml-2 text-sm text-gray-700">Include footer with page numbers</span>
+              <span className="ml-2 text-sm text-gray-700">
+                Include footer with page numbers
+              </span>
             </label>
           </div>
 
           {/* Preview Info */}
           <div className="bg-gray-50 p-3 rounded-md">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">Export Preview</h4>
+            <h4 className="text-sm font-medium text-gray-900 mb-2">
+              Export Preview
+            </h4>
             <div className="text-xs text-gray-600 space-y-1">
-              <p><strong>Format:</strong> {exportOptions.format.toUpperCase()}</p>
+              <p>
+                <strong>Format:</strong> {exportOptions.format.toUpperCase()}
+              </p>
               {exportOptions.format === 'pdf' && (
-                <p><strong>Content:</strong> {exportOptions.contentType === 'full' ? 'Full matrix details' :
-                  exportOptions.contentType === 'summary' ? 'Goal and areas summary' :
-                  'Completed tasks only'}</p>
+                <p>
+                  <strong>Content:</strong>{' '}
+                  {exportOptions.contentType === 'full'
+                    ? 'Full matrix details'
+                    : exportOptions.contentType === 'summary'
+                      ? 'Goal and areas summary'
+                      : 'Completed tasks only'}
+                </p>
               )}
-              {(exportOptions.format === 'png' || exportOptions.format === 'jpeg') && (
-                <p><strong>Quality:</strong> {Math.round((exportOptions.quality || 0.95) * 100)}%</p>
+              {(exportOptions.format === 'png' ||
+                exportOptions.format === 'jpeg') && (
+                <p>
+                  <strong>Quality:</strong>{' '}
+                  {Math.round((exportOptions.quality || 0.95) * 100)}%
+                </p>
               )}
-              <p><strong>Title:</strong> {exportOptions.title}</p>
+              <p>
+                <strong>Title:</strong> {exportOptions.title}
+              </p>
             </div>
           </div>
         </div>

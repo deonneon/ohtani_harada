@@ -1,12 +1,51 @@
-import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
-import { Grid, GoalEditor, FocusAreaEditor, SetupWizard, TaskEditor, BatchTaskCreator, TaskOrganizer, RecoveryDialog, StatisticsDashboard, CelebrationModal } from './components';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  lazy,
+  Suspense,
+} from 'react';
+import {
+  Grid,
+  GoalEditor,
+  FocusAreaEditor,
+  SetupWizard,
+  TaskEditor,
+  BatchTaskCreator,
+  TaskOrganizer,
+  RecoveryDialog,
+  StatisticsDashboard,
+  CelebrationModal,
+} from './components';
 
 // Lazy load heavy modal components for better mobile performance
-const ExportModal = lazy(() => import('./components/ExportModal').then(module => ({ default: module.default })));
-const TemplateSelector = lazy(() => import('./components/TemplateSelector').then(module => ({ default: module.default })));
-import { createEmptyMatrix, calculateOverallProgress, getMilestoneProgress } from './utils';
+const ExportModal = lazy(() =>
+  import('./components/ExportModal').then((module) => ({
+    default: module.default,
+  }))
+);
+const TemplateSelector = lazy(() =>
+  import('./components/TemplateSelector').then((module) => ({
+    default: module.default,
+  }))
+);
+import {
+  createEmptyMatrix,
+  calculateOverallProgress,
+  getMilestoneProgress,
+} from './utils';
 import { useAutoSave, useAutoSaveIndicator } from './hooks/useAutoSave';
-import { saveMatrixData, loadMatrixData, hasMatrixData, createBackup, restoreFromBackup, getBackupMetadata, StorageError, StorageCorruptionError } from './utils/storage';
+import {
+  saveMatrixData,
+  loadMatrixData,
+  hasMatrixData,
+  createBackup,
+  restoreFromBackup,
+  getBackupMetadata,
+  StorageError,
+  StorageCorruptionError,
+} from './utils/storage';
 import { MatrixData, CreateGoalInput, TaskStatus, TaskPriority } from './types';
 
 function App() {
@@ -24,10 +63,14 @@ function App() {
   const [matrixData, setMatrixData] = useState<MatrixData>(() => {
     try {
       const storedData = loadMatrixData();
-      return storedData || createEmptyMatrix({
-        title: 'Become a Professional Baseball Player',
-        description: 'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills'
-      });
+      return (
+        storedData ||
+        createEmptyMatrix({
+          title: 'Become a Professional Baseball Player',
+          description:
+            'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills',
+        })
+      );
     } catch (error) {
       console.warn('Failed to load matrix data from storage:', error);
 
@@ -46,7 +89,8 @@ function App() {
       // Return empty matrix as fallback
       return createEmptyMatrix({
         title: 'Become a Professional Baseball Player',
-        description: 'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills'
+        description:
+          'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills',
       });
     }
   });
@@ -67,7 +111,10 @@ function App() {
 
   // Task editor modal state
   const [isTaskEditorOpen, setIsTaskEditorOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<{task: any, areaId: string} | null>(null);
+  const [editingTask, setEditingTask] = useState<{
+    task: any;
+    areaId: string;
+  } | null>(null);
 
   // Batch task creator modal state
   const [isBatchCreatorOpen, setIsBatchCreatorOpen] = useState(false);
@@ -83,7 +130,9 @@ function App() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
   // View mode state
-  const [viewMode, setViewMode] = useState<'grid' | 'organizer' | 'statistics'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'organizer' | 'statistics'>(
+    'grid'
+  );
 
   // Auto-save functionality with 500ms debounce
   const autoSave = useAutoSave(matrixData, {
@@ -104,7 +153,7 @@ function App() {
       // Could implement additional error recovery strategies here
       // such as retry logic, backup to alternative storage, etc.
     },
-    enabled: true
+    enabled: true,
   });
 
   const { saveStatus, saveStatusText } = useAutoSaveIndicator(autoSave);
@@ -155,7 +204,7 @@ function App() {
 
     if (cellType === 'task') {
       // Find the task and its area
-      const task = matrixData.tasks.find(t => t.id === id);
+      const task = matrixData.tasks.find((t) => t.id === id);
       if (task) {
         handleOpenTaskEditor(task, task.areaId);
       }
@@ -180,13 +229,13 @@ function App() {
   };
 
   const handleSaveGoal = (goalData: CreateGoalInput) => {
-    setMatrixData(prevData => ({
+    setMatrixData((prevData) => ({
       ...prevData,
       goal: {
         ...prevData.goal,
         title: goalData.title,
-        description: goalData.description
-      }
+        description: goalData.description,
+      },
     }));
   };
 
@@ -200,14 +249,14 @@ function App() {
   };
 
   const handleSaveFocusAreas = (areaData: CreateFocusAreaInput[]) => {
-    setMatrixData(prevData => ({
+    setMatrixData((prevData) => ({
       ...prevData,
       focusAreas: areaData.map((area, index) => ({
         id: prevData.focusAreas[index]?.id || `area-${index + 1}`,
         title: area.title,
         description: area.description,
-        goalId: prevData.goal.id
-      }))
+        goalId: prevData.goal.id,
+      })),
     }));
   };
 
@@ -220,20 +269,23 @@ function App() {
     setIsSetupWizardOpen(false);
   };
 
-  const handleWizardComplete = (goalData: CreateGoalInput, areasData: CreateFocusAreaInput[]) => {
-    setMatrixData(prevData => ({
+  const handleWizardComplete = (
+    goalData: CreateGoalInput,
+    areasData: CreateFocusAreaInput[]
+  ) => {
+    setMatrixData((prevData) => ({
       ...prevData,
       goal: {
         ...prevData.goal,
         title: goalData.title,
-        description: goalData.description
+        description: goalData.description,
       },
       focusAreas: areasData.map((area, index) => ({
         id: prevData.focusAreas[index]?.id || `area-${index + 1}`,
         title: area.title,
         description: area.description,
-        goalId: prevData.goal.id
-      }))
+        goalId: prevData.goal.id,
+      })),
     }));
   };
 
@@ -258,30 +310,31 @@ function App() {
   const handleSaveTask = (taskData: any) => {
     if (editingTask?.task) {
       // Update existing task
-      setMatrixData(prevData => ({
+      setMatrixData((prevData) => ({
         ...prevData,
-        tasks: prevData.tasks.map(task =>
+        tasks: prevData.tasks.map((task) =>
           task.id === editingTask.task.id
             ? {
                 ...task,
                 ...taskData,
-                completedDate: taskData.status === 'completed' && task.status !== 'completed'
-                  ? new Date()
-                  : task.completedDate
+                completedDate:
+                  taskData.status === 'completed' && task.status !== 'completed'
+                    ? new Date()
+                    : task.completedDate,
               }
             : task
-        )
+        ),
       }));
     } else {
       // Create new task
       const newTask = {
         id: `task-${Date.now()}`,
         ...taskData,
-        completedDate: taskData.status === 'completed' ? new Date() : undefined
+        completedDate: taskData.status === 'completed' ? new Date() : undefined,
       };
-      setMatrixData(prevData => ({
+      setMatrixData((prevData) => ({
         ...prevData,
-        tasks: [...prevData.tasks, newTask]
+        tasks: [...prevData.tasks, newTask],
       }));
     }
   };
@@ -296,15 +349,15 @@ function App() {
   };
 
   const handleCreateBatchTasks = (taskData: any[]) => {
-    const newTasks = taskData.map(taskData => ({
+    const newTasks = taskData.map((taskData) => ({
       id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       ...taskData,
-      completedDate: taskData.status === 'completed' ? new Date() : undefined
+      completedDate: taskData.status === 'completed' ? new Date() : undefined,
     }));
 
-    setMatrixData(prevData => ({
+    setMatrixData((prevData) => ({
       ...prevData,
-      tasks: [...prevData.tasks, ...newTasks]
+      tasks: [...prevData.tasks, ...newTasks],
     }));
   };
 
@@ -333,9 +386,9 @@ function App() {
 
   // Task reordering handler
   const handleTaskReorder = (reorderedTasks: any[]) => {
-    setMatrixData(prevData => ({
+    setMatrixData((prevData) => ({
       ...prevData,
-      tasks: reorderedTasks
+      tasks: reorderedTasks,
     }));
   };
 
@@ -345,90 +398,102 @@ function App() {
   const switchToStatisticsView = () => setViewMode('statistics');
 
   // Keyboard shortcuts handler
-  const handleKeyboardShortcuts = useCallback((event: KeyboardEvent) => {
-    // Ignore if user is typing in an input/textarea
-    if (event.target instanceof HTMLInputElement ||
+  const handleKeyboardShortcuts = useCallback(
+    (event: KeyboardEvent) => {
+      // Ignore if user is typing in an input/textarea
+      if (
+        event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement ||
-        event.target instanceof HTMLSelectElement) {
-      return;
-    }
+        event.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
 
-    // Ignore if any modal is open
-    if (isGoalEditorOpen || isFocusAreaEditorOpen || isSetupWizardOpen ||
-        isTaskEditorOpen || isBatchCreatorOpen) {
-      return;
-    }
+      // Ignore if any modal is open
+      if (
+        isGoalEditorOpen ||
+        isFocusAreaEditorOpen ||
+        isSetupWizardOpen ||
+        isTaskEditorOpen ||
+        isBatchCreatorOpen
+      ) {
+        return;
+      }
 
-    const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+      const isCtrlOrCmd = event.ctrlKey || event.metaKey;
 
-    switch (event.key.toLowerCase()) {
-      case 'n':
-        if (isCtrlOrCmd) {
-          event.preventDefault();
-          handleOpenTaskEditor();
-        }
-        break;
-      case 'b':
-        if (isCtrlOrCmd) {
-          event.preventDefault();
-          handleOpenBatchCreator();
-        }
-        break;
-      case 'g':
-        if (isCtrlOrCmd) {
-          event.preventDefault();
-          switchToGridView();
-        }
-        break;
-      case 'o':
-        if (isCtrlOrCmd) {
-          event.preventDefault();
-          switchToOrganizerView();
-        }
-        break;
-      case 's':
-        if (isCtrlOrCmd) {
-          event.preventDefault();
-          switchToStatisticsView();
-        }
-        break;
-      case 'f':
-        if (isCtrlOrCmd && event.shiftKey) {
-          event.preventDefault();
-          // Focus first filter select
-          const firstFilter = document.querySelector('select#status-filter') as HTMLSelectElement;
-          firstFilter?.focus();
-        }
-        break;
-      case 'escape':
-        // Clear any selections in grid view
-        if (viewMode === 'grid' && selectedCellIds.length > 0) {
-          handleSelectionChange([]);
-        }
-        break;
-      case '?':
-        if (isCtrlOrCmd) {
-          event.preventDefault();
-          showKeyboardShortcutsHelp();
-        }
-        break;
-    }
-  }, [
-    isGoalEditorOpen,
-    isFocusAreaEditorOpen,
-    isSetupWizardOpen,
-    isTaskEditorOpen,
-    isBatchCreatorOpen,
-    viewMode,
-    selectedCellIds,
-    handleSelectionChange,
-    handleOpenTaskEditor,
-    handleOpenBatchCreator,
-    switchToGridView,
-    switchToOrganizerView,
-    switchToStatisticsView,
-    showKeyboardShortcutsHelp
-  ]);
+      switch (event.key.toLowerCase()) {
+        case 'n':
+          if (isCtrlOrCmd) {
+            event.preventDefault();
+            handleOpenTaskEditor();
+          }
+          break;
+        case 'b':
+          if (isCtrlOrCmd) {
+            event.preventDefault();
+            handleOpenBatchCreator();
+          }
+          break;
+        case 'g':
+          if (isCtrlOrCmd) {
+            event.preventDefault();
+            switchToGridView();
+          }
+          break;
+        case 'o':
+          if (isCtrlOrCmd) {
+            event.preventDefault();
+            switchToOrganizerView();
+          }
+          break;
+        case 's':
+          if (isCtrlOrCmd) {
+            event.preventDefault();
+            switchToStatisticsView();
+          }
+          break;
+        case 'f':
+          if (isCtrlOrCmd && event.shiftKey) {
+            event.preventDefault();
+            // Focus first filter select
+            const firstFilter = document.querySelector(
+              'select#status-filter'
+            ) as HTMLSelectElement;
+            firstFilter?.focus();
+          }
+          break;
+        case 'escape':
+          // Clear any selections in grid view
+          if (viewMode === 'grid' && selectedCellIds.length > 0) {
+            handleSelectionChange([]);
+          }
+          break;
+        case '?':
+          if (isCtrlOrCmd) {
+            event.preventDefault();
+            showKeyboardShortcutsHelp();
+          }
+          break;
+      }
+    },
+    [
+      isGoalEditorOpen,
+      isFocusAreaEditorOpen,
+      isSetupWizardOpen,
+      isTaskEditorOpen,
+      isBatchCreatorOpen,
+      viewMode,
+      selectedCellIds,
+      handleSelectionChange,
+      handleOpenTaskEditor,
+      handleOpenBatchCreator,
+      switchToGridView,
+      switchToOrganizerView,
+      switchToStatisticsView,
+      showKeyboardShortcutsHelp,
+    ]
+  );
 
   // Show keyboard shortcuts help
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
@@ -442,21 +507,23 @@ function App() {
   };
 
   // Filter tasks based on current filters
-  const filteredTasks = matrixData.tasks.filter(task => {
+  const filteredTasks = matrixData.tasks.filter((task) => {
     const statusMatch = statusFilter === 'all' || task.status === statusFilter;
-    const priorityMatch = priorityFilter === 'all' || task.priority === priorityFilter;
+    const priorityMatch =
+      priorityFilter === 'all' || task.priority === priorityFilter;
     return statusMatch && priorityMatch;
   });
 
   const filteredMatrixData = {
     ...matrixData,
-    tasks: filteredTasks
+    tasks: filteredTasks,
   };
 
   // Add global keyboard shortcuts
   useEffect(() => {
     document.addEventListener('keydown', handleKeyboardShortcuts);
-    return () => document.removeEventListener('keydown', handleKeyboardShortcuts);
+    return () =>
+      document.removeEventListener('keydown', handleKeyboardShortcuts);
   }, [handleKeyboardShortcuts]);
 
   return (
@@ -468,23 +535,37 @@ function App() {
 
         {/* Save Status Indicator */}
         <div className="flex justify-center mb-8">
-          <div className={`
+          <div
+            className={`
             inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-colors
-            ${saveStatus === 'saving' ? 'bg-yellow-100 text-yellow-800' :
-              saveStatus === 'saved' ? 'bg-green-100 text-green-800' :
-              'bg-gray-100 text-gray-800'}
-          `}>
+            ${
+              saveStatus === 'saving'
+                ? 'bg-yellow-100 text-yellow-800'
+                : saveStatus === 'saved'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-800'
+            }
+          `}
+          >
             {saveStatus === 'saving' && (
               <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
             )}
             {saveStatus === 'saved' && (
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
             )}
             {saveStatus === 'error' && (
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
               </svg>
             )}
             <span>{saveStatusText}</span>
@@ -494,9 +575,11 @@ function App() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">
-              {viewMode === 'grid' ? 'Interactive Matrix Grid' :
-               viewMode === 'organizer' ? 'Task Organizer' :
-               'Progress Statistics'}
+              {viewMode === 'grid'
+                ? 'Interactive Matrix Grid'
+                : viewMode === 'organizer'
+                  ? 'Task Organizer'
+                  : 'Progress Statistics'}
             </h2>
             <div className="flex gap-2">
               <button
@@ -596,10 +679,15 @@ function App() {
 
           {/* Task Filters */}
           <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">Filter Tasks</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-3">
+              Filter Tasks
+            </h3>
             <div className="flex flex-wrap gap-4">
               <div>
-                <label htmlFor="status-filter" className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="status-filter"
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                >
                   Status
                 </label>
                 <select
@@ -616,7 +704,10 @@ function App() {
               </div>
 
               <div>
-                <label htmlFor="priority-filter" className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="priority-filter"
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                >
                   Priority
                 </label>
                 <select
@@ -653,28 +744,38 @@ function App() {
               {/* Desktop instructions */}
               <div className="hidden sm:block">
                 <p>
-                  <strong>Click</strong> to select cells. <strong>Ctrl+Click</strong> (or <strong>Cmd+Click</strong>) to multi-select. <strong>Shift+Click</strong> for range selection.
+                  <strong>Click</strong> to select cells.{' '}
+                  <strong>Ctrl+Click</strong> (or <strong>Cmd+Click</strong>) to
+                  multi-select. <strong>Shift+Click</strong> for range
+                  selection.
                 </p>
                 <p>
-                  Use <strong>arrow keys</strong> to navigate, <strong>Space/Enter</strong> to select, <strong>Esc</strong> to clear selection.
+                  Use <strong>arrow keys</strong> to navigate,{' '}
+                  <strong>Space/Enter</strong> to select, <strong>Esc</strong>{' '}
+                  to clear selection.
                 </p>
                 <p>
-                  <strong>Scroll</strong> to zoom, <strong>click and drag</strong> when zoomed to pan. Use zoom controls to adjust view.
+                  <strong>Scroll</strong> to zoom,{' '}
+                  <strong>click and drag</strong> when zoomed to pan. Use zoom
+                  controls to adjust view.
                 </p>
               </div>
 
               {/* Mobile instructions */}
               <div className="sm:hidden">
                 <p>
-                  <strong>Tap</strong> focus areas to expand/collapse and view tasks. <strong>Tap</strong> cells to select them.
+                  <strong>Tap</strong> focus areas to expand/collapse and view
+                  tasks. <strong>Tap</strong> cells to select them.
                 </p>
                 <p>
-                  <strong>Pinch</strong> to zoom, <strong>drag</strong> when zoomed to pan. Use zoom controls for precise adjustment.
+                  <strong>Pinch</strong> to zoom, <strong>drag</strong> when
+                  zoomed to pan. Use zoom controls for precise adjustment.
                 </p>
               </div>
 
               <p className="text-sm opacity-75">
-                The interface automatically adapts to your screen size - desktop shows a 9×9 grid, mobile shows an expandable list.
+                The interface automatically adapts to your screen size - desktop
+                shows a 9×9 grid, mobile shows an expandable list.
               </p>
             </div>
           )}
@@ -682,10 +783,12 @@ function App() {
           {viewMode === 'organizer' && (
             <div className="text-gray-600 mb-6">
               <p>
-                <strong>Drag and drop</strong> tasks to reorder them within each focus area. <strong>Click</strong> any task to edit it.
+                <strong>Drag and drop</strong> tasks to reorder them within each
+                focus area. <strong>Click</strong> any task to edit it.
               </p>
               <p className="text-sm opacity-75 mt-2">
-                Use the filters above to focus on specific tasks, and switch back to Grid view to see the visual matrix.
+                Use the filters above to focus on specific tasks, and switch
+                back to Grid view to see the visual matrix.
               </p>
             </div>
           )}
@@ -706,7 +809,9 @@ function App() {
                   tasks={filteredTasks}
                   focusAreas={matrixData.focusAreas}
                   onTaskReorder={handleTaskReorder}
-                  onTaskClick={(task) => handleOpenTaskEditor(task, task.areaId)}
+                  onTaskClick={(task) =>
+                    handleOpenTaskEditor(task, task.areaId)
+                  }
                   dragEnabled={true}
                 />
               </div>
@@ -720,11 +825,15 @@ function App() {
           {viewMode === 'grid' && selectedCellIds.length > 0 && (
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800 mb-2">
-                Selected {selectedCellIds.length} cell{selectedCellIds.length !== 1 ? 's' : ''}:
+                Selected {selectedCellIds.length} cell
+                {selectedCellIds.length !== 1 ? 's' : ''}:
               </p>
               <div className="flex flex-wrap gap-2">
-                {selectedCellIds.map(id => (
-                  <code key={id} className="bg-blue-100 px-2 py-1 rounded text-xs">
+                {selectedCellIds.map((id) => (
+                  <code
+                    key={id}
+                    className="bg-blue-100 px-2 py-1 rounded text-xs"
+                  >
                     {id.slice(0, 8)}...
                   </code>
                 ))}
@@ -741,21 +850,29 @@ function App() {
               <div className="text-sm text-blue-800">Goal</div>
             </div>
             <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{matrixData.focusAreas.length}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {matrixData.focusAreas.length}
+              </div>
               <div className="text-sm text-green-800">Focus Areas</div>
             </div>
             <div className="bg-yellow-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-yellow-600">
                 {filteredTasks.length}
                 {filteredTasks.length !== matrixData.tasks.length && (
-                  <span className="text-xs text-yellow-700 block">of {matrixData.tasks.length}</span>
+                  <span className="text-xs text-yellow-700 block">
+                    of {matrixData.tasks.length}
+                  </span>
                 )}
               </div>
               <div className="text-sm text-yellow-800">Tasks</div>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-purple-600">
-                {matrixData.tasks.filter(t => t.status === TaskStatus.COMPLETED).length}
+                {
+                  matrixData.tasks.filter(
+                    (t) => t.status === TaskStatus.COMPLETED
+                  ).length
+                }
               </div>
               <div className="text-sm text-purple-800">Completed</div>
             </div>
@@ -763,9 +880,11 @@ function App() {
           {(statusFilter !== 'all' || priorityFilter !== 'all') && (
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">
-                <strong>Filtered:</strong> Showing {filteredTasks.length} of {matrixData.tasks.length} tasks
+                <strong>Filtered:</strong> Showing {filteredTasks.length} of{' '}
+                {matrixData.tasks.length} tasks
                 {statusFilter !== 'all' && ` with status "${statusFilter}"`}
-                {priorityFilter !== 'all' && ` with priority "${priorityFilter}"`}
+                {priorityFilter !== 'all' &&
+                  ` with priority "${priorityFilter}"`}
               </p>
             </div>
           )}
@@ -832,13 +951,19 @@ function App() {
         {/* Batch Task Creator Modal */}
         <BatchTaskCreator
           isOpen={isBatchCreatorOpen}
-          focusAreaIds={matrixData.focusAreas.map(area => area.id)}
+          focusAreaIds={matrixData.focusAreas.map((area) => area.id)}
           onCreate={handleCreateBatchTasks}
           onClose={handleCloseBatchCreator}
         />
 
         {/* Export Modal - Lazy loaded */}
-        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"><div className="text-white">Loading...</div></div>}>
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="text-white">Loading...</div>
+            </div>
+          }
+        >
           <ExportModal
             isOpen={isExportModalOpen}
             matrixData={matrixData}
@@ -848,7 +973,13 @@ function App() {
         </Suspense>
 
         {/* Template Selector Modal - Lazy loaded */}
-        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"><div className="text-white">Loading...</div></div>}>
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="text-white">Loading...</div>
+            </div>
+          }
+        >
           <TemplateSelector
             isOpen={isTemplateSelectorOpen}
             onSelectTemplate={handleSelectTemplate}
@@ -870,7 +1001,10 @@ function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 id="shortcuts-title" className="text-xl font-semibold text-gray-900">
+                <h2
+                  id="shortcuts-title"
+                  className="text-xl font-semibold text-gray-900"
+                >
                   Keyboard Shortcuts
                 </h2>
                 <button
@@ -878,8 +1012,18 @@ function App() {
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                   aria-label="Close shortcuts help"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -887,57 +1031,81 @@ function App() {
               <div className="p-6">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">Task Management</h3>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">
+                      Task Management
+                    </h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Create Task</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+N</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Ctrl+N
+                        </kbd>
                       </div>
                       <div className="flex justify-between">
                         <span>Batch Create Tasks</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+B</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Ctrl+B
+                        </kbd>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">View Modes</h3>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">
+                      View Modes
+                    </h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Grid View</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+G</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Ctrl+G
+                        </kbd>
                       </div>
                       <div className="flex justify-between">
                         <span>Organizer View</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+O</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Ctrl+O
+                        </kbd>
                       </div>
                       <div className="flex justify-between">
                         <span>Statistics View</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+S</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Ctrl+S
+                        </kbd>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">Navigation</h3>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">
+                      Navigation
+                    </h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Focus Filters</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+Shift+F</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Ctrl+Shift+F
+                        </kbd>
                       </div>
                       <div className="flex justify-between">
                         <span>Clear Selection (Grid)</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Esc</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Esc
+                        </kbd>
                       </div>
                       <div className="flex justify-between">
                         <span>Show Shortcuts</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+?</kbd>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">
+                          Ctrl+?
+                        </kbd>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">Grid Navigation (when focused)</h3>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">
+                      Grid Navigation (when focused)
+                    </h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Navigate</span>
@@ -960,7 +1128,8 @@ function App() {
 
                   <div className="pt-4 border-t border-gray-200">
                     <p className="text-xs text-gray-600">
-                      <strong>Tip:</strong> Keyboard shortcuts are disabled when typing in forms or when modals are open.
+                      <strong>Tip:</strong> Keyboard shortcuts are disabled when
+                      typing in forms or when modals are open.
                     </p>
                   </div>
                 </div>

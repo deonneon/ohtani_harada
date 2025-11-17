@@ -15,9 +15,11 @@ export const RecoveryDialog: React.FC<RecoveryDialogProps> = ({
   onClose,
   onRecover,
   error,
-  corruptedData
+  corruptedData,
 }) => {
-  const [recoveryOption, setRecoveryOption] = useState<'backup' | 'empty' | 'manual'>('backup');
+  const [recoveryOption, setRecoveryOption] = useState<
+    'backup' | 'empty' | 'manual'
+  >('backup');
 
   if (!isOpen) return null;
 
@@ -26,23 +28,29 @@ export const RecoveryDialog: React.FC<RecoveryDialogProps> = ({
       case 'backup':
         // Try to recover from backup (could be implemented later)
         // For now, create empty matrix
-        onRecover(createEmptyMatrix({
-          title: 'Recovered Matrix',
-          description: 'Matrix recovered after data corruption'
-        }));
+        onRecover(
+          createEmptyMatrix({
+            title: 'Recovered Matrix',
+            description: 'Matrix recovered after data corruption',
+          })
+        );
         break;
       case 'empty':
-        onRecover(createEmptyMatrix({
-          title: 'New Matrix',
-          description: 'Started fresh after data recovery'
-        }));
+        onRecover(
+          createEmptyMatrix({
+            title: 'New Matrix',
+            description: 'Started fresh after data recovery',
+          })
+        );
         break;
       case 'manual':
         // Could implement manual data entry recovery
-        onRecover(createEmptyMatrix({
-          title: 'Manual Recovery Matrix',
-          description: 'Manual recovery after data corruption'
-        }));
+        onRecover(
+          createEmptyMatrix({
+            title: 'Manual Recovery Matrix',
+            description: 'Manual recovery after data corruption',
+          })
+        );
         break;
     }
     onClose();
@@ -78,7 +86,9 @@ export const RecoveryDialog: React.FC<RecoveryDialogProps> = ({
                 onChange={(e) => setRecoveryOption(e.target.value as 'backup')}
                 className="mr-2"
               />
-              <span className="text-sm">Try to restore from backup (recommended)</span>
+              <span className="text-sm">
+                Try to restore from backup (recommended)
+              </span>
             </label>
 
             <label className="flex items-center">

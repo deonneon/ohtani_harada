@@ -11,7 +11,7 @@ export const STORAGE_VERSION = '1.0.0';
 export const STORAGE_KEYS = {
   MATRIX_DATA: 'ohtani-harada-matrix',
   VERSION: 'ohtani-harada-version',
-  LAST_SAVED: 'ohtani-harada-last-saved'
+  LAST_SAVED: 'ohtani-harada-last-saved',
 } as const;
 
 /**
@@ -30,7 +30,10 @@ export interface StoredMatrixData {
  * Custom error types for storage operations
  */
 export class StorageError extends Error {
-  constructor(message: string, public readonly cause?: Error) {
+  constructor(
+    message: string,
+    public readonly cause?: Error
+  ) {
     super(message);
     this.name = 'StorageError';
   }
@@ -85,7 +88,7 @@ function validateStoredData(data: any): MatrixData {
     id: String(data.goal.id || ''),
     title: String(data.goal.title || ''),
     description: String(data.goal.description || ''),
-    createdDate: parseDate(data.goal.createdDate)
+    createdDate: parseDate(data.goal.createdDate),
   };
 
   // Validate focus areas
@@ -93,18 +96,22 @@ function validateStoredData(data: any): MatrixData {
     throw new StorageCorruptionError('Missing or invalid focus areas');
   }
 
-  const focusAreas: FocusArea[] = data.focusAreas.map((area: any, index: number) => {
-    if (!area || typeof area !== 'object') {
-      throw new StorageCorruptionError(`Invalid focus area at index ${index}`);
-    }
+  const focusAreas: FocusArea[] = data.focusAreas.map(
+    (area: any, index: number) => {
+      if (!area || typeof area !== 'object') {
+        throw new StorageCorruptionError(
+          `Invalid focus area at index ${index}`
+        );
+      }
 
-    return {
-      id: String(area.id || ''),
-      title: String(area.title || ''),
-      description: String(area.description || ''),
-      goalId: String(area.goalId || '')
-    };
-  });
+      return {
+        id: String(area.id || ''),
+        title: String(area.title || ''),
+        description: String(area.description || ''),
+        goalId: String(area.goalId || ''),
+      };
+    }
+  );
 
   // Validate tasks
   if (!Array.isArray(data.tasks)) {
@@ -119,7 +126,9 @@ function validateStoredData(data: any): MatrixData {
     // Validate task status
     const validStatuses = Object.values(TaskStatus);
     if (!validStatuses.includes(task.status)) {
-      throw new StorageCorruptionError(`Invalid task status at index ${index}: ${task.status}`);
+      throw new StorageCorruptionError(
+        `Invalid task status at index ${index}: ${task.status}`
+      );
     }
 
     const parsedTask: Task = {
@@ -127,7 +136,7 @@ function validateStoredData(data: any): MatrixData {
       title: String(task.title || ''),
       description: String(task.description || ''),
       areaId: String(task.areaId || ''),
-      status: task.status as TaskStatus
+      status: task.status as TaskStatus,
     };
 
     // Optional completedDate
@@ -149,7 +158,7 @@ export function serializeMatrixData(matrixData: MatrixData): StoredMatrixData {
   return {
     version: STORAGE_VERSION,
     data: matrixData,
-    lastSaved: new Date().toISOString()
+    lastSaved: new Date().toISOString(),
   };
 }
 
@@ -157,14 +166,21 @@ export function serializeMatrixData(matrixData: MatrixData): StoredMatrixData {
  * Deserialize stored data back to MatrixData
  * Validates data integrity and handles migrations
  */
-export function deserializeMatrixData(storedData: StoredMatrixData): MatrixData {
+export function deserializeMatrixData(
+  storedData: StoredMatrixData
+): MatrixData {
   // Version check and migration
   if (!storedData.version) {
     throw new StorageCorruptionError('Missing version information');
   }
 
   // Import migration engine here to avoid circular dependencies
-  const { migrationEngine, validateMigrationResult, needsMigration, createBackwardCompatibilityLayer } = require('./migrations');
+  const {
+    migrationEngine,
+    validateMigrationResult,
+    needsMigration,
+    createBackwardCompatibilityLayer,
+  } = require('./migrations');
 
   // Apply migrations if needed
   if (needsMigration(storedData)) {
@@ -172,7 +188,9 @@ export function deserializeMatrixData(storedData: StoredMatrixData): MatrixData 
     validateMigrationResult(migrationResult);
 
     // Log migration success (in a real app, this might go to a logger)
-    console.info(`Data migrated: ${migrationResult.appliedMigrations.length} migrations applied`);
+    console.info(
+      `Data migrated: ${migrationResult.appliedMigrations.length} migrations applied`
+    );
   }
 
   // Apply backward compatibility layer for very old formats
@@ -204,7 +222,10 @@ function decompressData(compressedData: string): string {
     return decodeURIComponent(atob(compressedData));
   } catch (error) {
     // If decompression fails, assume data was not compressed
-    console.warn('Data decompression failed, assuming uncompressed data:', error);
+    console.warn(
+      'Data decompression failed, assuming uncompressed data:',
+      error
+    );
     return compressedData;
   }
 }
@@ -219,7 +240,8 @@ export function saveMatrixData(matrixData: MatrixData): void {
 
     // Try compression if data is large (> 1MB)
     let compressed = false;
-    if (jsonString.length > 1024 * 1024) { // 1MB threshold for compression
+    if (jsonString.length > 1024 * 1024) {
+      // 1MB threshold for compression
       try {
         const compressedString = compressData(jsonString);
         // Only use compression if it actually reduces size significantly (>10%)
@@ -228,12 +250,16 @@ export function saveMatrixData(matrixData: MatrixData): void {
           compressed = true;
         }
       } catch (compressionError) {
-        console.warn('Compression failed, saving uncompressed data:', compressionError);
+        console.warn(
+          'Compression failed, saving uncompressed data:',
+          compressionError
+        );
       }
     }
 
     // Check if data will fit in localStorage (rough estimate: 5MB limit)
-    if (jsonString.length > 4 * 1024 * 1024) { // 4MB threshold
+    if (jsonString.length > 4 * 1024 * 1024) {
+      // 4MB threshold
       throw new StorageQuotaExceededError();
     }
 
@@ -241,23 +267,29 @@ export function saveMatrixData(matrixData: MatrixData): void {
     localStorage.setItem(STORAGE_KEYS.MATRIX_DATA, jsonString);
     localStorage.setItem(STORAGE_KEYS.VERSION, STORAGE_VERSION);
     localStorage.setItem(STORAGE_KEYS.LAST_SAVED, serializedData.lastSaved);
-    localStorage.setItem(`${STORAGE_KEYS.MATRIX_DATA}_compressed`, compressed.toString());
-
+    localStorage.setItem(
+      `${STORAGE_KEYS.MATRIX_DATA}_compressed`,
+      compressed.toString()
+    );
   } catch (error) {
     if (error instanceof StorageQuotaExceededError) {
       throw error;
     }
 
     // Check if it's a quota exceeded error from the browser
-    if (error instanceof Error && (
-      error.name === 'QuotaExceededError' ||
-      error.message.includes('quota') ||
-      error.message.includes('storage')
-    )) {
+    if (
+      error instanceof Error &&
+      (error.name === 'QuotaExceededError' ||
+        error.message.includes('quota') ||
+        error.message.includes('storage'))
+    ) {
       throw new StorageQuotaExceededError();
     }
 
-    throw new StorageError('Failed to save data to localStorage', error as Error);
+    throw new StorageError(
+      'Failed to save data to localStorage',
+      error as Error
+    );
   }
 }
 
@@ -267,7 +299,8 @@ export function saveMatrixData(matrixData: MatrixData): void {
 export function loadMatrixData(): MatrixData | null {
   try {
     const storedJson = localStorage.getItem(STORAGE_KEYS.MATRIX_DATA);
-    const isCompressed = localStorage.getItem(`${STORAGE_KEYS.MATRIX_DATA}_compressed`) === 'true';
+    const isCompressed =
+      localStorage.getItem(`${STORAGE_KEYS.MATRIX_DATA}_compressed`) === 'true';
 
     if (!storedJson) {
       return null; // No data stored yet
@@ -279,16 +312,21 @@ export function loadMatrixData(): MatrixData | null {
       try {
         processedJson = decompressData(storedJson);
       } catch (decompressionError) {
-        console.warn('Failed to decompress data, trying to load as uncompressed:', decompressionError);
+        console.warn(
+          'Failed to decompress data, trying to load as uncompressed:',
+          decompressionError
+        );
         // Fall back to trying uncompressed data
       }
     }
 
     const storedData: StoredMatrixData = JSON.parse(processedJson);
     return deserializeMatrixData(storedData);
-
   } catch (error) {
-    if (error instanceof StorageCorruptionError || error instanceof StorageError) {
+    if (
+      error instanceof StorageCorruptionError ||
+      error instanceof StorageError
+    ) {
       throw error;
     }
 
@@ -297,7 +335,10 @@ export function loadMatrixData(): MatrixData | null {
       throw new StorageCorruptionError('Stored data is not valid JSON');
     }
 
-    throw new StorageError('Failed to load data from localStorage', error as Error);
+    throw new StorageError(
+      'Failed to load data from localStorage',
+      error as Error
+    );
   }
 }
 
@@ -311,7 +352,10 @@ export function clearMatrixData(): void {
     localStorage.removeItem(STORAGE_KEYS.LAST_SAVED);
     localStorage.removeItem(`${STORAGE_KEYS.MATRIX_DATA}_compressed`);
   } catch (error) {
-    throw new StorageError('Failed to clear data from localStorage', error as Error);
+    throw new StorageError(
+      'Failed to clear data from localStorage',
+      error as Error
+    );
   }
 }
 
@@ -329,14 +373,17 @@ export function hasMatrixData(): boolean {
 /**
  * Get storage metadata (version, last saved time)
  */
-export function getStorageMetadata(): { version: string | null; lastSaved: Date | null } {
+export function getStorageMetadata(): {
+  version: string | null;
+  lastSaved: Date | null;
+} {
   try {
     const version = localStorage.getItem(STORAGE_KEYS.VERSION);
     const lastSavedString = localStorage.getItem(STORAGE_KEYS.LAST_SAVED);
 
     return {
       version,
-      lastSaved: lastSavedString ? new Date(lastSavedString) : null
+      lastSaved: lastSavedString ? new Date(lastSavedString) : null,
     };
   } catch (error) {
     return { version: null, lastSaved: null };
@@ -361,7 +408,7 @@ export function getStorageUsage(): number {
 export const BACKUP_KEYS = {
   BACKUP_DATA: 'ohtani-harada-backup-data',
   BACKUP_TIMESTAMP: 'ohtani-harada-backup-timestamp',
-  BACKUP_VERSION: 'ohtani-harada-backup-version'
+  BACKUP_VERSION: 'ohtani-harada-backup-version',
 } as const;
 
 /**
@@ -373,7 +420,10 @@ export function createBackup(matrixData: MatrixData): void {
     const jsonString = JSON.stringify(serializedData);
 
     localStorage.setItem(BACKUP_KEYS.BACKUP_DATA, jsonString);
-    localStorage.setItem(BACKUP_KEYS.BACKUP_TIMESTAMP, new Date().toISOString());
+    localStorage.setItem(
+      BACKUP_KEYS.BACKUP_TIMESTAMP,
+      new Date().toISOString()
+    );
     localStorage.setItem(BACKUP_KEYS.BACKUP_VERSION, STORAGE_VERSION);
 
     console.info('Backup created successfully');
@@ -407,7 +457,11 @@ export function restoreFromBackup(): MatrixData | null {
 /**
  * Check if backup exists and get backup metadata
  */
-export function getBackupMetadata(): { exists: boolean; timestamp: Date | null; version: string | null } {
+export function getBackupMetadata(): {
+  exists: boolean;
+  timestamp: Date | null;
+  version: string | null;
+} {
   try {
     const timestamp = localStorage.getItem(BACKUP_KEYS.BACKUP_TIMESTAMP);
     const version = localStorage.getItem(BACKUP_KEYS.BACKUP_VERSION);
@@ -416,7 +470,7 @@ export function getBackupMetadata(): { exists: boolean; timestamp: Date | null; 
     return {
       exists,
       timestamp: timestamp ? new Date(timestamp) : null,
-      version
+      version,
     };
   } catch (error) {
     return { exists: false, timestamp: null, version: null };

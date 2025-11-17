@@ -42,13 +42,16 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
   areaId,
   onClose,
   onSave,
-  mode = 'modal'
+  mode = 'modal',
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<TaskStatus>(TaskStatus.PENDING);
   const [priority, setPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
-  const [errors, setErrors] = useState<{title?: string; description?: string}>({});
+  const [errors, setErrors] = useState<{
+    title?: string;
+    description?: string;
+  }>({});
 
   // Mobile detection
   const isMobile = useIsMobile();
@@ -75,7 +78,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: {title?: string; description?: string} = {};
+    const newErrors: { title?: string; description?: string } = {};
 
     // Validation
     if (!title.trim()) {
@@ -101,7 +104,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
       description: description.trim(),
       status,
       priority,
-      areaId
+      areaId,
     });
 
     onClose();
@@ -132,18 +135,34 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
 
   // Status options for dropdown
   const statusOptions = [
-    { value: TaskStatus.PENDING, label: 'Not Started', color: 'bg-gray-100 text-gray-800' },
-    { value: TaskStatus.IN_PROGRESS, label: 'In Progress', color: 'bg-blue-100 text-blue-800' },
-    { value: TaskStatus.COMPLETED, label: 'Completed', color: 'bg-green-100 text-green-800' }
+    {
+      value: TaskStatus.PENDING,
+      label: 'Not Started',
+      color: 'bg-gray-100 text-gray-800',
+    },
+    {
+      value: TaskStatus.IN_PROGRESS,
+      label: 'In Progress',
+      color: 'bg-blue-100 text-blue-800',
+    },
+    {
+      value: TaskStatus.COMPLETED,
+      label: 'Completed',
+      color: 'bg-green-100 text-green-800',
+    },
   ];
 
   const getStatusOption = (statusValue: TaskStatus) =>
-    statusOptions.find(option => option.value === statusValue) || statusOptions[0];
+    statusOptions.find((option) => option.value === statusValue) ||
+    statusOptions[0];
 
   if (mode === 'inline') {
     // Inline editing mode
     return (
-      <form onSubmit={handleSubmit} className="space-y-3 p-4 bg-gray-50 rounded-lg border">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-3 p-4 bg-gray-50 rounded-lg border"
+      >
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Task Title *
@@ -154,12 +173,16 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className={`w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 ${
-              errors.title ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+              errors.title
+                ? 'border-red-300 focus:ring-red-500'
+                : 'border-gray-300 focus:ring-blue-500'
             }`}
             placeholder="Enter task title..."
             maxLength={100}
           />
-          {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title}</p>}
+          {errors.title && (
+            <p className="mt-1 text-xs text-red-600">{errors.title}</p>
+          )}
         </div>
 
         <div>
@@ -171,12 +194,16 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             className={`w-full px-2 py-1 text-sm border rounded resize-none focus:outline-none focus:ring-1 ${
-              errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+              errors.description
+                ? 'border-red-300 focus:ring-red-500'
+                : 'border-gray-300 focus:ring-blue-500'
             }`}
             placeholder="Describe what needs to be done..."
             maxLength={300}
           />
-          {errors.description && <p className="mt-1 text-xs text-red-600">{errors.description}</p>}
+          {errors.description && (
+            <p className="mt-1 text-xs text-red-600">{errors.description}</p>
+          )}
         </div>
 
         <div>
@@ -188,7 +215,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
             onChange={(e) => setStatus(e.target.value as TaskStatus)}
             className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            {statusOptions.map(option => (
+            {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -248,9 +275,11 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={`flex items-center justify-between border-b border-gray-200 ${
-          isMobile ? 'p-4' : 'p-6'
-        }`}>
+        <div
+          className={`flex items-center justify-between border-b border-gray-200 ${
+            isMobile ? 'p-4' : 'p-6'
+          }`}
+        >
           <h2
             id="task-editor-title"
             className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900`}
@@ -264,14 +293,27 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
             }`}
             aria-label="Close modal"
           >
-            <svg className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className={`${isMobile ? 'p-4 space-y-4' : 'p-6 space-y-6'}`}>
+        <form
+          onSubmit={handleSubmit}
+          className={`${isMobile ? 'p-4 space-y-4' : 'p-6 space-y-6'}`}
+        >
           {/* Title Field */}
           <div>
             <label
@@ -287,17 +329,21 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className={`w-full border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.title ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
-              } ${
-                isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2'
-              }`}
+                errors.title
+                  ? 'border-red-300 focus:ring-red-500'
+                  : 'border-gray-300'
+              } ${isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2'}`}
               placeholder="e.g., Practice hitting mechanics for 30 minutes"
               maxLength={100}
-              aria-describedby={errors.title ? "title-error" : undefined}
+              aria-describedby={errors.title ? 'title-error' : undefined}
               aria-invalid={!!errors.title}
             />
             {errors.title && (
-              <p id="title-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="title-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.title}
               </p>
             )}
@@ -320,17 +366,23 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               rows={isMobile ? 3 : 4}
               className={`w-full border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical ${
-                errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
-              } ${
-                isMobile ? 'px-4 py-3 text-base' : 'px-3 py-2'
-              }`}
+                errors.description
+                  ? 'border-red-300 focus:ring-red-500'
+                  : 'border-gray-300'
+              } ${isMobile ? 'px-4 py-3 text-base' : 'px-3 py-2'}`}
               placeholder="Describe what needs to be done, why it's important, and any specific requirements..."
               maxLength={300}
-              aria-describedby={errors.description ? "description-error" : undefined}
+              aria-describedby={
+                errors.description ? 'description-error' : undefined
+              }
               aria-invalid={!!errors.description}
             />
             {errors.description && (
-              <p id="description-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="description-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.description}
               </p>
             )}
@@ -355,18 +407,20 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
                 isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2'
               }`}
             >
-              {statusOptions.map(option => (
+              {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
             </select>
             <div className="mt-2 flex gap-2">
-              {statusOptions.map(option => (
+              {statusOptions.map((option) => (
                 <span
                   key={option.value}
                   className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    status === option.value ? option.color : 'bg-gray-100 text-gray-600'
+                    status === option.value
+                      ? option.color
+                      : 'bg-gray-100 text-gray-600'
                   }`}
                 >
                   {option.label}
@@ -391,16 +445,26 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
                 isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2'
               }`}
             >
-              <option value={TaskPriority.LOW}>🔵 Low Priority - Nice to have</option>
-              <option value={TaskPriority.MEDIUM}>🟡 Medium Priority - Should do</option>
-              <option value={TaskPriority.HIGH}>🔴 High Priority - Must do</option>
+              <option value={TaskPriority.LOW}>
+                🔵 Low Priority - Nice to have
+              </option>
+              <option value={TaskPriority.MEDIUM}>
+                🟡 Medium Priority - Should do
+              </option>
+              <option value={TaskPriority.HIGH}>
+                🔴 High Priority - Must do
+              </option>
             </select>
             <div className="mt-2 flex gap-2">
-              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                priority === TaskPriority.LOW ? 'bg-blue-100 text-blue-800' :
-                priority === TaskPriority.MEDIUM ? 'bg-yellow-100 text-yellow-800' :
-                'bg-gray-100 text-gray-600'
-              }`}>
+              <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  priority === TaskPriority.LOW
+                    ? 'bg-blue-100 text-blue-800'
+                    : priority === TaskPriority.MEDIUM
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-600'
+                }`}
+              >
                 {priority === TaskPriority.LOW && '🔵 Low'}
                 {priority === TaskPriority.MEDIUM && '🟡 Medium'}
                 {priority === TaskPriority.HIGH && '🔴 High'}
@@ -414,16 +478,20 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               💡 Task Creation Tips
             </h3>
             <p className="text-sm text-blue-800">
-              Great tasks are <strong>specific</strong>, <strong>actionable</strong>, and <strong>measurable</strong>.
-              Instead of "Practice more," write "Complete 100 swings with proper form analysis."
+              Great tasks are <strong>specific</strong>,{' '}
+              <strong>actionable</strong>, and <strong>measurable</strong>.
+              Instead of "Practice more," write "Complete 100 swings with proper
+              form analysis."
             </p>
           </div>
         </form>
 
         {/* Footer */}
-        <div className={`flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 rounded-b-lg ${
-          isMobile ? 'px-4 py-4 flex-col space-y-2' : 'px-6 py-4'
-        }`}>
+        <div
+          className={`flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 rounded-b-lg ${
+            isMobile ? 'px-4 py-4 flex-col space-y-2' : 'px-6 py-4'
+          }`}
+        >
           <button
             type="button"
             onClick={handleClose}

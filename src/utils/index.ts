@@ -7,7 +7,7 @@ export type {
   CreateGoalInput,
   CreateFocusAreaInput,
   CreateTaskInput,
-  TaskStatus
+  TaskStatus,
 } from '../types';
 
 // Factory function exports
@@ -19,7 +19,7 @@ export {
   createFocusAreas,
   createEmptyTaskMatrix,
   createEmptyMatrix,
-  createMinimalMatrix
+  createMinimalMatrix,
 } from './factories';
 
 // Storage utility exports
@@ -35,7 +35,7 @@ export {
   StoredMatrixData,
   StorageError,
   StorageQuotaExceededError,
-  StorageCorruptionError
+  StorageCorruptionError,
 } from './storage';
 
 // CRUD utility exports
@@ -58,7 +58,7 @@ export {
   getCompletedTaskCount,
   getTaskCountByStatus,
   getTaskCountByArea,
-  validateMatrixIntegrity
+  validateMatrixIntegrity,
 } from './crud';
 
 // Validation utility exports
@@ -80,7 +80,7 @@ export {
   isValidTaskStatus,
   isGoal,
   isFocusArea,
-  isTask
+  isTask,
 } from './validation';
 
 // Migration utility exports
@@ -95,7 +95,7 @@ export {
   VersionUtils,
   Migration,
   MigrationFunction,
-  MigrationResult
+  MigrationResult,
 } from './migrations';
 
 // Hook exports

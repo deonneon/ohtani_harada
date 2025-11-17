@@ -1,4 +1,13 @@
-import { Goal, FocusArea, Task, TaskStatus, CreateGoalInput, CreateFocusAreaInput, CreateTaskInput, MatrixData } from './types';
+import {
+  Goal,
+  FocusArea,
+  Task,
+  TaskStatus,
+  CreateGoalInput,
+  CreateFocusAreaInput,
+  CreateTaskInput,
+  MatrixData,
+} from './types';
 
 /**
  * Validation result interface
@@ -36,7 +45,7 @@ export const HARADA_METHOD_LIMITS = {
   MIN_TASK_TITLE_LENGTH: 3,
   MAX_TASK_TITLE_LENGTH: 80,
   MIN_TASK_DESCRIPTION_LENGTH: 5,
-  MAX_TASK_DESCRIPTION_LENGTH: 300
+  MAX_TASK_DESCRIPTION_LENGTH: 300,
 } as const;
 
 // ============ TYPE GUARDS ============
@@ -104,18 +113,30 @@ export function validateGoalInput(input: CreateGoalInput): ValidationResult {
   if (!input.title || typeof input.title !== 'string') {
     errors.push('Goal title is required');
   } else if (input.title.length < HARADA_METHOD_LIMITS.MIN_GOAL_TITLE_LENGTH) {
-    errors.push(`Goal title must be at least ${HARADA_METHOD_LIMITS.MIN_GOAL_TITLE_LENGTH} characters`);
+    errors.push(
+      `Goal title must be at least ${HARADA_METHOD_LIMITS.MIN_GOAL_TITLE_LENGTH} characters`
+    );
   } else if (input.title.length > HARADA_METHOD_LIMITS.MAX_GOAL_TITLE_LENGTH) {
-    errors.push(`Goal title must not exceed ${HARADA_METHOD_LIMITS.MAX_GOAL_TITLE_LENGTH} characters`);
+    errors.push(
+      `Goal title must not exceed ${HARADA_METHOD_LIMITS.MAX_GOAL_TITLE_LENGTH} characters`
+    );
   }
 
   // Description validation
   if (!input.description || typeof input.description !== 'string') {
     errors.push('Goal description is required');
-  } else if (input.description.length < HARADA_METHOD_LIMITS.MIN_GOAL_DESCRIPTION_LENGTH) {
-    errors.push(`Goal description must be at least ${HARADA_METHOD_LIMITS.MIN_GOAL_DESCRIPTION_LENGTH} characters`);
-  } else if (input.description.length > HARADA_METHOD_LIMITS.MAX_GOAL_DESCRIPTION_LENGTH) {
-    errors.push(`Goal description must not exceed ${HARADA_METHOD_LIMITS.MAX_GOAL_DESCRIPTION_LENGTH} characters`);
+  } else if (
+    input.description.length < HARADA_METHOD_LIMITS.MIN_GOAL_DESCRIPTION_LENGTH
+  ) {
+    errors.push(
+      `Goal description must be at least ${HARADA_METHOD_LIMITS.MIN_GOAL_DESCRIPTION_LENGTH} characters`
+    );
+  } else if (
+    input.description.length > HARADA_METHOD_LIMITS.MAX_GOAL_DESCRIPTION_LENGTH
+  ) {
+    errors.push(
+      `Goal description must not exceed ${HARADA_METHOD_LIMITS.MAX_GOAL_DESCRIPTION_LENGTH} characters`
+    );
   }
 
   // Check for meaningful content
@@ -129,25 +150,39 @@ export function validateGoalInput(input: CreateGoalInput): ValidationResult {
 /**
  * Validate focus area creation input
  */
-export function validateFocusAreaInput(input: CreateFocusAreaInput): ValidationResult {
+export function validateFocusAreaInput(
+  input: CreateFocusAreaInput
+): ValidationResult {
   const errors: string[] = [];
 
   // Title validation
   if (!input.title || typeof input.title !== 'string') {
     errors.push('Focus area title is required');
   } else if (input.title.length < HARADA_METHOD_LIMITS.MIN_AREA_TITLE_LENGTH) {
-    errors.push(`Focus area title must be at least ${HARADA_METHOD_LIMITS.MIN_AREA_TITLE_LENGTH} characters`);
+    errors.push(
+      `Focus area title must be at least ${HARADA_METHOD_LIMITS.MIN_AREA_TITLE_LENGTH} characters`
+    );
   } else if (input.title.length > HARADA_METHOD_LIMITS.MAX_AREA_TITLE_LENGTH) {
-    errors.push(`Focus area title must not exceed ${HARADA_METHOD_LIMITS.MAX_AREA_TITLE_LENGTH} characters`);
+    errors.push(
+      `Focus area title must not exceed ${HARADA_METHOD_LIMITS.MAX_AREA_TITLE_LENGTH} characters`
+    );
   }
 
   // Description validation
   if (!input.description || typeof input.description !== 'string') {
     errors.push('Focus area description is required');
-  } else if (input.description.length < HARADA_METHOD_LIMITS.MIN_AREA_DESCRIPTION_LENGTH) {
-    errors.push(`Focus area description must be at least ${HARADA_METHOD_LIMITS.MIN_AREA_DESCRIPTION_LENGTH} characters`);
-  } else if (input.description.length > HARADA_METHOD_LIMITS.MAX_AREA_DESCRIPTION_LENGTH) {
-    errors.push(`Focus area description must not exceed ${HARADA_METHOD_LIMITS.MAX_AREA_DESCRIPTION_LENGTH} characters`);
+  } else if (
+    input.description.length < HARADA_METHOD_LIMITS.MIN_AREA_DESCRIPTION_LENGTH
+  ) {
+    errors.push(
+      `Focus area description must be at least ${HARADA_METHOD_LIMITS.MIN_AREA_DESCRIPTION_LENGTH} characters`
+    );
+  } else if (
+    input.description.length > HARADA_METHOD_LIMITS.MAX_AREA_DESCRIPTION_LENGTH
+  ) {
+    errors.push(
+      `Focus area description must not exceed ${HARADA_METHOD_LIMITS.MAX_AREA_DESCRIPTION_LENGTH} characters`
+    );
   }
 
   // Goal ID validation
@@ -168,18 +203,30 @@ export function validateTaskInput(input: CreateTaskInput): ValidationResult {
   if (!input.title || typeof input.title !== 'string') {
     errors.push('Task title is required');
   } else if (input.title.length < HARADA_METHOD_LIMITS.MIN_TASK_TITLE_LENGTH) {
-    errors.push(`Task title must be at least ${HARADA_METHOD_LIMITS.MIN_TASK_TITLE_LENGTH} characters`);
+    errors.push(
+      `Task title must be at least ${HARADA_METHOD_LIMITS.MIN_TASK_TITLE_LENGTH} characters`
+    );
   } else if (input.title.length > HARADA_METHOD_LIMITS.MAX_TASK_TITLE_LENGTH) {
-    errors.push(`Task title must not exceed ${HARADA_METHOD_LIMITS.MAX_TASK_TITLE_LENGTH} characters`);
+    errors.push(
+      `Task title must not exceed ${HARADA_METHOD_LIMITS.MAX_TASK_TITLE_LENGTH} characters`
+    );
   }
 
   // Description validation
   if (!input.description || typeof input.description !== 'string') {
     errors.push('Task description is required');
-  } else if (input.description.length < HARADA_METHOD_LIMITS.MIN_TASK_DESCRIPTION_LENGTH) {
-    errors.push(`Task description must be at least ${HARADA_METHOD_LIMITS.MIN_TASK_DESCRIPTION_LENGTH} characters`);
-  } else if (input.description.length > HARADA_METHOD_LIMITS.MAX_TASK_DESCRIPTION_LENGTH) {
-    errors.push(`Task description must not exceed ${HARADA_METHOD_LIMITS.MAX_TASK_DESCRIPTION_LENGTH} characters`);
+  } else if (
+    input.description.length < HARADA_METHOD_LIMITS.MIN_TASK_DESCRIPTION_LENGTH
+  ) {
+    errors.push(
+      `Task description must be at least ${HARADA_METHOD_LIMITS.MIN_TASK_DESCRIPTION_LENGTH} characters`
+    );
+  } else if (
+    input.description.length > HARADA_METHOD_LIMITS.MAX_TASK_DESCRIPTION_LENGTH
+  ) {
+    errors.push(
+      `Task description must not exceed ${HARADA_METHOD_LIMITS.MAX_TASK_DESCRIPTION_LENGTH} characters`
+    );
   }
 
   // Area ID validation
@@ -200,11 +247,15 @@ export function validateTaskInput(input: CreateTaskInput): ValidationResult {
 /**
  * Validate that adding a focus area would not exceed limits
  */
-export function validateFocusAreaAddition(matrixData: MatrixData): ValidationResult {
+export function validateFocusAreaAddition(
+  matrixData: MatrixData
+): ValidationResult {
   const errors: string[] = [];
 
   if (matrixData.focusAreas.length >= HARADA_METHOD_LIMITS.MAX_FOCUS_AREAS) {
-    errors.push(`Cannot add more than ${HARADA_METHOD_LIMITS.MAX_FOCUS_AREAS} focus areas (Harada Method limit)`);
+    errors.push(
+      `Cannot add more than ${HARADA_METHOD_LIMITS.MAX_FOCUS_AREAS} focus areas (Harada Method limit)`
+    );
   }
 
   return { isValid: errors.length === 0, errors };
@@ -213,17 +264,26 @@ export function validateFocusAreaAddition(matrixData: MatrixData): ValidationRes
 /**
  * Validate that adding a task would not exceed limits
  */
-export function validateTaskAddition(matrixData: MatrixData, areaId: string): ValidationResult {
+export function validateTaskAddition(
+  matrixData: MatrixData,
+  areaId: string
+): ValidationResult {
   const errors: string[] = [];
 
-  const tasksInArea = matrixData.tasks.filter(task => task.areaId === areaId).length;
+  const tasksInArea = matrixData.tasks.filter(
+    (task) => task.areaId === areaId
+  ).length;
   if (tasksInArea >= HARADA_METHOD_LIMITS.MAX_TASKS_PER_AREA) {
-    errors.push(`Cannot add more than ${HARADA_METHOD_LIMITS.MAX_TASKS_PER_AREA} tasks per focus area (Harada Method limit)`);
+    errors.push(
+      `Cannot add more than ${HARADA_METHOD_LIMITS.MAX_TASKS_PER_AREA} tasks per focus area (Harada Method limit)`
+    );
   }
 
   const totalTasks = matrixData.tasks.length;
   if (totalTasks >= HARADA_METHOD_LIMITS.MAX_TOTAL_TASKS) {
-    errors.push(`Cannot add more than ${HARADA_METHOD_LIMITS.MAX_TOTAL_TASKS} total tasks (Harada Method limit)`);
+    errors.push(
+      `Cannot add more than ${HARADA_METHOD_LIMITS.MAX_TOTAL_TASKS} total tasks (Harada Method limit)`
+    );
   }
 
   return { isValid: errors.length === 0, errors };
@@ -232,41 +292,53 @@ export function validateTaskAddition(matrixData: MatrixData, areaId: string): Va
 /**
  * Validate complete matrix against Harada Method rules
  */
-export function validateHaradaMethodCompliance(matrixData: MatrixData): ValidationResult {
+export function validateHaradaMethodCompliance(
+  matrixData: MatrixData
+): ValidationResult {
   const errors: string[] = [];
 
   // Check focus area count
   if (matrixData.focusAreas.length > HARADA_METHOD_LIMITS.MAX_FOCUS_AREAS) {
-    errors.push(`Matrix has ${matrixData.focusAreas.length} focus areas, but Harada Method allows maximum ${HARADA_METHOD_LIMITS.MAX_FOCUS_AREAS}`);
+    errors.push(
+      `Matrix has ${matrixData.focusAreas.length} focus areas, but Harada Method allows maximum ${HARADA_METHOD_LIMITS.MAX_FOCUS_AREAS}`
+    );
   }
 
   // Check total task count
   if (matrixData.tasks.length > HARADA_METHOD_LIMITS.MAX_TOTAL_TASKS) {
-    errors.push(`Matrix has ${matrixData.tasks.length} tasks, but Harada Method allows maximum ${HARADA_METHOD_LIMITS.MAX_TOTAL_TASKS}`);
+    errors.push(
+      `Matrix has ${matrixData.tasks.length} tasks, but Harada Method allows maximum ${HARADA_METHOD_LIMITS.MAX_TOTAL_TASKS}`
+    );
   }
 
   // Check tasks per area
   const taskCountByArea: Record<string, number> = {};
-  matrixData.tasks.forEach(task => {
+  matrixData.tasks.forEach((task) => {
     taskCountByArea[task.areaId] = (taskCountByArea[task.areaId] || 0) + 1;
   });
 
   Object.entries(taskCountByArea).forEach(([areaId, count]) => {
     if (count > HARADA_METHOD_LIMITS.MAX_TASKS_PER_AREA) {
-      const area = matrixData.focusAreas.find(a => a.id === areaId);
+      const area = matrixData.focusAreas.find((a) => a.id === areaId);
       const areaName = area ? area.title : areaId;
-      errors.push(`Focus area "${areaName}" has ${count} tasks, but Harada Method allows maximum ${HARADA_METHOD_LIMITS.MAX_TASKS_PER_AREA} per area`);
+      errors.push(
+        `Focus area "${areaName}" has ${count} tasks, but Harada Method allows maximum ${HARADA_METHOD_LIMITS.MAX_TASKS_PER_AREA} per area`
+      );
     }
   });
 
   // Check for meaningful content
-  if (matrixData.goal.title.toLowerCase().includes('test') ||
-      matrixData.goal.title.toLowerCase().includes('placeholder')) {
-    errors.push('Goal title should be meaningful and specific to your actual objective');
+  if (
+    matrixData.goal.title.toLowerCase().includes('test') ||
+    matrixData.goal.title.toLowerCase().includes('placeholder')
+  ) {
+    errors.push(
+      'Goal title should be meaningful and specific to your actual objective'
+    );
   }
 
   // Check focus area uniqueness
-  const areaTitles = matrixData.focusAreas.map(a => a.title.toLowerCase());
+  const areaTitles = matrixData.focusAreas.map((a) => a.title.toLowerCase());
   const uniqueTitles = new Set(areaTitles);
   if (uniqueTitles.size !== areaTitles.length) {
     errors.push('Focus area titles should be unique');
@@ -280,21 +352,29 @@ export function validateHaradaMethodCompliance(matrixData: MatrixData): Validati
 /**
  * Validate referential integrity of matrix data
  */
-export function validateReferentialIntegrity(matrixData: MatrixData): ValidationResult {
+export function validateReferentialIntegrity(
+  matrixData: MatrixData
+): ValidationResult {
   const errors: string[] = [];
 
   // Check that all focus areas reference the goal
-  matrixData.focusAreas.forEach(area => {
+  matrixData.focusAreas.forEach((area) => {
     if (area.goalId !== matrixData.goal.id) {
-      errors.push(`Focus area "${area.title}" references non-existent goal "${area.goalId}"`);
+      errors.push(
+        `Focus area "${area.title}" references non-existent goal "${area.goalId}"`
+      );
     }
   });
 
   // Check that all tasks reference existing focus areas
-  matrixData.tasks.forEach(task => {
-    const areaExists = matrixData.focusAreas.some(area => area.id === task.areaId);
+  matrixData.tasks.forEach((task) => {
+    const areaExists = matrixData.focusAreas.some(
+      (area) => area.id === task.areaId
+    );
     if (!areaExists) {
-      errors.push(`Task "${task.title}" references non-existent focus area "${task.areaId}"`);
+      errors.push(
+        `Task "${task.title}" references non-existent focus area "${task.areaId}"`
+      );
     }
   });
 
@@ -304,7 +384,9 @@ export function validateReferentialIntegrity(matrixData: MatrixData): Validation
 /**
  * Validate data structure integrity (IDs, types, etc.)
  */
-export function validateDataStructure(matrixData: MatrixData): ValidationResult {
+export function validateDataStructure(
+  matrixData: MatrixData
+): ValidationResult {
   const errors: string[] = [];
 
   // Validate goal
@@ -328,8 +410,8 @@ export function validateDataStructure(matrixData: MatrixData): ValidationResult 
 
   // Check for duplicate IDs
   const goalIds = [matrixData.goal.id];
-  const areaIds = matrixData.focusAreas.map(a => a.id);
-  const taskIds = matrixData.tasks.map(t => t.id);
+  const areaIds = matrixData.focusAreas.map((a) => a.id);
+  const taskIds = matrixData.tasks.map((t) => t.id);
 
   const allIds = [...goalIds, ...areaIds, ...taskIds];
   const uniqueIds = new Set(allIds);
@@ -353,16 +435,16 @@ export function validateMatrix(matrixData: MatrixData): ValidationResult {
   const validations = [
     validateHaradaMethodCompliance(matrixData),
     validateReferentialIntegrity(matrixData),
-    validateDataStructure(matrixData)
+    validateDataStructure(matrixData),
   ];
 
-  validations.forEach(validation => {
+  validations.forEach((validation) => {
     allErrors.push(...validation.errors);
   });
 
   return {
     isValid: allErrors.length === 0,
-    errors: allErrors
+    errors: allErrors,
   };
 }
 

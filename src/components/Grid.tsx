@@ -1,5 +1,9 @@
 import React, { JSX } from 'react';
-import { MatrixData, calculateAreaProgress, calculateOverallProgress } from '../utils';
+import {
+  MatrixData,
+  calculateAreaProgress,
+  calculateOverallProgress,
+} from '../utils';
 import GoalCell from './GoalCell';
 import AreaHeaderCell from './AreaHeaderCell';
 import TaskCell from './TaskCell';
@@ -27,7 +31,9 @@ interface GridProps {
  */
 // Custom hook for responsive detection with more granular breakpoints
 const useResponsiveBreakpoint = () => {
-  const [breakpoint, setBreakpoint] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
+  const [breakpoint, setBreakpoint] = React.useState<
+    'mobile' | 'tablet' | 'desktop'
+  >('desktop');
 
   React.useEffect(() => {
     const checkBreakpoint = () => {
@@ -62,7 +68,7 @@ const useResponsiveBreakpoint = () => {
     breakpoint,
     isMobile: breakpoint === 'mobile',
     isTablet: breakpoint === 'tablet',
-    isDesktop: breakpoint === 'desktop'
+    isDesktop: breakpoint === 'desktop',
   };
 };
 
@@ -71,10 +77,11 @@ const Grid: React.FC<GridProps> = ({
   onCellClick,
   onSelectionChange,
   selectedCellIds = [],
-  className = ''
+  className = '',
 }) => {
   // Internal state for selection management
-  const [internalSelectedIds, setInternalSelectedIds] = React.useState<string[]>(selectedCellIds);
+  const [internalSelectedIds, setInternalSelectedIds] =
+    React.useState<string[]>(selectedCellIds);
   const [focusedCellId, setFocusedCellId] = React.useState<string | null>(null);
   const gridRef = React.useRef<HTMLDivElement>(null);
 
@@ -85,7 +92,8 @@ const Grid: React.FC<GridProps> = ({
   const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 });
 
   // Use responsive breakpoint hook
-  const { breakpoint, isMobile, isTablet, isDesktop } = useResponsiveBreakpoint();
+  const { breakpoint, isMobile, isTablet, isDesktop } =
+    useResponsiveBreakpoint();
 
   // Sync external selection changes
   React.useEffect(() => {
@@ -93,100 +101,120 @@ const Grid: React.FC<GridProps> = ({
   }, [selectedCellIds]);
 
   // Update external selection when internal selection changes
-  const updateSelection = React.useCallback((newSelection: string[]) => {
-    setInternalSelectedIds(newSelection);
-    onSelectionChange?.(newSelection);
-  }, [onSelectionChange]);
+  const updateSelection = React.useCallback(
+    (newSelection: string[]) => {
+      setInternalSelectedIds(newSelection);
+      onSelectionChange?.(newSelection);
+    },
+    [onSelectionChange]
+  );
 
   // Handle cell click with multi-selection support
-  const handleCellClick = React.useCallback((cellType: 'goal' | 'area' | 'task', cellId: string, event: React.MouseEvent) => {
-    const isMultiSelect = event.ctrlKey || event.metaKey;
-    const isShiftSelect = event.shiftKey;
+  const handleCellClick = React.useCallback(
+    (
+      cellType: 'goal' | 'area' | 'task',
+      cellId: string,
+      event: React.MouseEvent
+    ) => {
+      const isMultiSelect = event.ctrlKey || event.metaKey;
+      const isShiftSelect = event.shiftKey;
 
-    let newSelection: string[];
+      let newSelection: string[];
 
-    if (isMultiSelect) {
-      // Toggle selection
-      if (internalSelectedIds.includes(cellId)) {
-        newSelection = internalSelectedIds.filter(id => id !== cellId);
+      if (isMultiSelect) {
+        // Toggle selection
+        if (internalSelectedIds.includes(cellId)) {
+          newSelection = internalSelectedIds.filter((id) => id !== cellId);
+        } else {
+          newSelection = [...internalSelectedIds, cellId];
+        }
+      } else if (isShiftSelect && internalSelectedIds.length > 0) {
+        // Range selection (simplified - select from last selected to current)
+        const lastSelected =
+          internalSelectedIds[internalSelectedIds.length - 1];
+        const rangeSelection = getCellRange(lastSelected, cellId, matrixData);
+        newSelection = Array.from(
+          new Set([...internalSelectedIds, ...rangeSelection])
+        );
       } else {
-        newSelection = [...internalSelectedIds, cellId];
+        // Single selection
+        newSelection = [cellId];
       }
-    } else if (isShiftSelect && internalSelectedIds.length > 0) {
-      // Range selection (simplified - select from last selected to current)
-      const lastSelected = internalSelectedIds[internalSelectedIds.length - 1];
-      const rangeSelection = getCellRange(lastSelected, cellId, matrixData);
-      newSelection = Array.from(new Set([...internalSelectedIds, ...rangeSelection]));
-    } else {
-      // Single selection
-      newSelection = [cellId];
-    }
 
-    updateSelection(newSelection);
-    setFocusedCellId(cellId);
-    onCellClick?.(cellType, cellId);
-  }, [internalSelectedIds, updateSelection, onCellClick]);
+      updateSelection(newSelection);
+      setFocusedCellId(cellId);
+      onCellClick?.(cellType, cellId);
+    },
+    [internalSelectedIds, updateSelection, onCellClick]
+  );
 
   // Keyboard navigation handler
-  const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
-    if (!focusedCellId) return;
+  const handleKeyDown = React.useCallback(
+    (event: KeyboardEvent) => {
+      if (!focusedCellId) return;
 
-    const currentPos = getCellPosition(focusedCellId, matrixData);
-    if (!currentPos) return;
+      const currentPos = getCellPosition(focusedCellId, matrixData);
+      if (!currentPos) return;
 
-    let newRow = currentPos.row;
-    let newCol = currentPos.col;
+      let newRow = currentPos.row;
+      let newCol = currentPos.col;
 
-    switch (event.key) {
-      case 'ArrowUp':
-        newRow = Math.max(0, currentPos.row - 1);
-        break;
-      case 'ArrowDown':
-        newRow = Math.min(8, currentPos.row + 1);
-        break;
-      case 'ArrowLeft':
-        newCol = Math.max(0, currentPos.col - 1);
-        break;
-      case 'ArrowRight':
-        newCol = Math.min(8, currentPos.col + 1);
-        break;
-      case 'Home':
-        newCol = 0;
-        break;
-      case 'End':
-        newCol = 8;
-        break;
-      case 'PageUp':
-        newRow = 0;
-        break;
-      case 'PageDown':
-        newRow = 8;
-        break;
-      case 'Escape':
-        updateSelection([]);
-        setFocusedCellId(null);
-        return;
-      case ' ':
-      case 'Enter':
-        // Simulate click on focused cell
-        const cellId = getCellId(newRow, newCol);
-        if (cellId) {
-          const cellType = getCellType(newRow, newCol, matrixData);
-          if (cellType !== 'empty') {
-            handleCellClick(cellType, cellId, { ctrlKey: false, metaKey: false, shiftKey: false } as any);
+      switch (event.key) {
+        case 'ArrowUp':
+          newRow = Math.max(0, currentPos.row - 1);
+          break;
+        case 'ArrowDown':
+          newRow = Math.min(8, currentPos.row + 1);
+          break;
+        case 'ArrowLeft':
+          newCol = Math.max(0, currentPos.col - 1);
+          break;
+        case 'ArrowRight':
+          newCol = Math.min(8, currentPos.col + 1);
+          break;
+        case 'Home':
+          newCol = 0;
+          break;
+        case 'End':
+          newCol = 8;
+          break;
+        case 'PageUp':
+          newRow = 0;
+          break;
+        case 'PageDown':
+          newRow = 8;
+          break;
+        case 'Escape':
+          updateSelection([]);
+          setFocusedCellId(null);
+          return;
+        case ' ':
+        case 'Enter':
+          // Simulate click on focused cell
+          const cellId = getCellId(newRow, newCol);
+          if (cellId) {
+            const cellType = getCellType(newRow, newCol, matrixData);
+            if (cellType !== 'empty') {
+              handleCellClick(cellType, cellId, {
+                ctrlKey: false,
+                metaKey: false,
+                shiftKey: false,
+              } as any);
+            }
           }
-        }
-        return;
-      default:
-        return;
-    }
+          return;
+        default:
+          return;
+      }
 
-    event.preventDefault();
-    const newCellId = getCellId(newRow, newCol);
-    if (newCellId && getCellType(newRow, newCol, matrixData) !== 'empty') {
-      setFocusedCellId(newCellId);
-    }
-  }, [focusedCellId, matrixData, handleCellClick, updateSelection]);
+      event.preventDefault();
+      const newCellId = getCellId(newRow, newCol);
+      if (newCellId && getCellType(newRow, newCol, matrixData) !== 'empty') {
+        setFocusedCellId(newCellId);
+      }
+    },
+    [focusedCellId, matrixData, handleCellClick, updateSelection]
+  );
 
   // Add keyboard event listeners
   React.useEffect(() => {
@@ -201,22 +229,28 @@ const Grid: React.FC<GridProps> = ({
   }, [handleKeyDown]);
 
   // Check if cell is selected
-  const isCellSelected = React.useCallback((cellId: string) => {
-    return internalSelectedIds.includes(cellId);
-  }, [internalSelectedIds]);
+  const isCellSelected = React.useCallback(
+    (cellId: string) => {
+      return internalSelectedIds.includes(cellId);
+    },
+    [internalSelectedIds]
+  );
 
   // Check if cell is focused
-  const isCellFocused = React.useCallback((cellId: string) => {
-    return focusedCellId === cellId;
-  }, [focusedCellId]);
+  const isCellFocused = React.useCallback(
+    (cellId: string) => {
+      return focusedCellId === cellId;
+    },
+    [focusedCellId]
+  );
 
   // Zoom controls
   const zoomIn = React.useCallback(() => {
-    setZoomLevel(prev => Math.min(prev * 1.2, 3));
+    setZoomLevel((prev) => Math.min(prev * 1.2, 3));
   }, []);
 
   const zoomOut = React.useCallback(() => {
-    setZoomLevel(prev => Math.max(prev / 1.2, 0.5));
+    setZoomLevel((prev) => Math.max(prev / 1.2, 0.5));
   }, []);
 
   const resetZoom = React.useCallback(() => {
@@ -225,124 +259,172 @@ const Grid: React.FC<GridProps> = ({
   }, []);
 
   // Mouse event handlers for pan and zoom
-  const handleMouseDown = React.useCallback((event: React.MouseEvent) => {
-    if (zoomLevel > 1 && !isMobile) {
-      setIsDragging(true);
-      setDragStart({ x: event.clientX - panOffset.x, y: event.clientY - panOffset.y });
-    }
-  }, [zoomLevel, panOffset, isMobile]);
+  const handleMouseDown = React.useCallback(
+    (event: React.MouseEvent) => {
+      if (zoomLevel > 1 && !isMobile) {
+        setIsDragging(true);
+        setDragStart({
+          x: event.clientX - panOffset.x,
+          y: event.clientY - panOffset.y,
+        });
+      }
+    },
+    [zoomLevel, panOffset, isMobile]
+  );
 
-  const handleMouseMove = React.useCallback((event: React.MouseEvent) => {
-    if (isDragging && zoomLevel > 1) {
-      setPanOffset({
-        x: event.clientX - dragStart.x,
-        y: event.clientY - dragStart.y
-      });
-    }
-  }, [isDragging, zoomLevel, dragStart]);
+  const handleMouseMove = React.useCallback(
+    (event: React.MouseEvent) => {
+      if (isDragging && zoomLevel > 1) {
+        setPanOffset({
+          x: event.clientX - dragStart.x,
+          y: event.clientY - dragStart.y,
+        });
+      }
+    },
+    [isDragging, zoomLevel, dragStart]
+  );
 
   const handleMouseUp = React.useCallback(() => {
     setIsDragging(false);
   }, []);
 
-  const handleWheel = React.useCallback((event: React.WheelEvent) => {
-    if (!isMobile) {
-      event.preventDefault();
-      const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
-      setZoomLevel(prev => Math.max(0.5, Math.min(3, prev * zoomFactor)));
-    }
-  }, [isMobile]);
+  const handleWheel = React.useCallback(
+    (event: React.WheelEvent) => {
+      if (!isMobile) {
+        event.preventDefault();
+        const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
+        setZoomLevel((prev) => Math.max(0.5, Math.min(3, prev * zoomFactor)));
+      }
+    },
+    [isMobile]
+  );
 
   // Touch event handlers for mobile zoom and swipe navigation
-  const [touchStart, setTouchStart] = React.useState<{ x: number; y: number; distance?: number; time?: number } | null>(null);
-  const [swipeStartArea, setSwipeStartArea] = React.useState<string | null>(null);
+  const [touchStart, setTouchStart] = React.useState<{
+    x: number;
+    y: number;
+    distance?: number;
+    time?: number;
+  } | null>(null);
+  const [swipeStartArea, setSwipeStartArea] = React.useState<string | null>(
+    null
+  );
 
-  const handleTouchStart = React.useCallback((event: React.TouchEvent, areaId?: string) => {
-    if (event.touches.length === 1) {
-      // Single touch - potential pan or swipe
-      const touch = event.touches[0];
-      setTouchStart({ x: touch.clientX, y: touch.clientY, time: Date.now() });
-      if (areaId && isMobile) {
-        setSwipeStartArea(areaId);
+  const handleTouchStart = React.useCallback(
+    (event: React.TouchEvent, areaId?: string) => {
+      if (event.touches.length === 1) {
+        // Single touch - potential pan or swipe
+        const touch = event.touches[0];
+        setTouchStart({ x: touch.clientX, y: touch.clientY, time: Date.now() });
+        if (areaId && isMobile) {
+          setSwipeStartArea(areaId);
+        }
+      } else if (event.touches.length === 2) {
+        // Two touches - pinch zoom
+        const touch1 = event.touches[0];
+        const touch2 = event.touches[1];
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+        setTouchStart({
+          x: (touch1.clientX + touch2.clientX) / 2,
+          y: (touch1.clientY + touch2.clientY) / 2,
+          distance,
+          time: Date.now(),
+        });
+        setSwipeStartArea(null); // Cancel swipe when pinching
       }
-    } else if (event.touches.length === 2) {
-      // Two touches - pinch zoom
-      const touch1 = event.touches[0];
-      const touch2 = event.touches[1];
-      const distance = Math.sqrt(
-        Math.pow(touch2.clientX - touch1.clientX, 2) +
-        Math.pow(touch2.clientY - touch1.clientY, 2)
-      );
-      setTouchStart({ x: (touch1.clientX + touch2.clientX) / 2, y: (touch1.clientY + touch2.clientY) / 2, distance, time: Date.now() });
-      setSwipeStartArea(null); // Cancel swipe when pinching
-    }
-  }, [isMobile]);
+    },
+    [isMobile]
+  );
 
-  const handleTouchMove = React.useCallback((event: React.TouchEvent) => {
-    if (!touchStart) return;
+  const handleTouchMove = React.useCallback(
+    (event: React.TouchEvent) => {
+      if (!touchStart) return;
 
-    if (event.touches.length === 1 && zoomLevel > 1) {
-      // Single touch pan
-      const touch = event.touches[0];
-      const deltaX = touch.clientX - touchStart.x;
-      const deltaY = touch.clientY - touchStart.y;
-      setPanOffset(prev => ({
-        x: prev.x + deltaX,
-        y: prev.y + deltaY
-      }));
-      setTouchStart({ x: touch.clientX, y: touch.clientY });
-    } else if (event.touches.length === 2 && touchStart.distance) {
-      // Two touch pinch zoom
-      const touch1 = event.touches[0];
-      const touch2 = event.touches[1];
-      const distance = Math.sqrt(
-        Math.pow(touch2.clientX - touch1.clientX, 2) +
-        Math.pow(touch2.clientY - touch1.clientY, 2)
-      );
-      const zoomFactor = distance / touchStart.distance;
-      setZoomLevel(prev => Math.max(0.5, Math.min(3, prev * zoomFactor)));
-      setTouchStart({ x: (touch1.clientX + touch2.clientX) / 2, y: (touch1.clientY + touch2.clientY) / 2, distance });
-    }
-  }, [touchStart, zoomLevel]);
+      if (event.touches.length === 1 && zoomLevel > 1) {
+        // Single touch pan
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - touchStart.x;
+        const deltaY = touch.clientY - touchStart.y;
+        setPanOffset((prev) => ({
+          x: prev.x + deltaX,
+          y: prev.y + deltaY,
+        }));
+        setTouchStart({ x: touch.clientX, y: touch.clientY });
+      } else if (event.touches.length === 2 && touchStart.distance) {
+        // Two touch pinch zoom
+        const touch1 = event.touches[0];
+        const touch2 = event.touches[1];
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+        const zoomFactor = distance / touchStart.distance;
+        setZoomLevel((prev) => Math.max(0.5, Math.min(3, prev * zoomFactor)));
+        setTouchStart({
+          x: (touch1.clientX + touch2.clientX) / 2,
+          y: (touch1.clientY + touch2.clientY) / 2,
+          distance,
+        });
+      }
+    },
+    [touchStart, zoomLevel]
+  );
 
-  const handleTouchEnd = React.useCallback((event: React.TouchEvent) => {
-    if (!touchStart || !touchStart.time) {
-      setTouchStart(null);
-      setSwipeStartArea(null);
-      return;
-    }
+  const handleTouchEnd = React.useCallback(
+    (event: React.TouchEvent) => {
+      if (!touchStart || !touchStart.time) {
+        setTouchStart(null);
+        setSwipeStartArea(null);
+        return;
+      }
 
-    const touchEndTime = Date.now();
-    const touchDuration = touchEndTime - touchStart.time;
+      const touchEndTime = Date.now();
+      const touchDuration = touchEndTime - touchStart.time;
 
-    if (event.changedTouches.length === 1 && swipeStartArea && isMobile && touchDuration < 300) {
-      // Check for swipe gesture
-      const touch = event.changedTouches[0];
-      const deltaX = touch.clientX - touchStart.x;
-      const deltaY = touch.clientY - touchStart.y;
-      const absDeltaX = Math.abs(deltaX);
-      const absDeltaY = Math.abs(deltaY);
+      if (
+        event.changedTouches.length === 1 &&
+        swipeStartArea &&
+        isMobile &&
+        touchDuration < 300
+      ) {
+        // Check for swipe gesture
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStart.x;
+        const deltaY = touch.clientY - touchStart.y;
+        const absDeltaX = Math.abs(deltaX);
+        const absDeltaY = Math.abs(deltaY);
 
-      // Only consider horizontal swipes that are longer than vertical movement
-      if (absDeltaX > absDeltaY && absDeltaX > 50) {
-        const currentAreaIndex = matrixData.focusAreas.findIndex(area => area.id === swipeStartArea);
-        if (currentAreaIndex !== -1) {
-          const nextAreaIndex = deltaX > 0
-            ? Math.max(0, currentAreaIndex - 1) // Swipe right -> previous area
-            : Math.min(matrixData.focusAreas.length - 1, currentAreaIndex + 1); // Swipe left -> next area
+        // Only consider horizontal swipes that are longer than vertical movement
+        if (absDeltaX > absDeltaY && absDeltaX > 50) {
+          const currentAreaIndex = matrixData.focusAreas.findIndex(
+            (area) => area.id === swipeStartArea
+          );
+          if (currentAreaIndex !== -1) {
+            const nextAreaIndex =
+              deltaX > 0
+                ? Math.max(0, currentAreaIndex - 1) // Swipe right -> previous area
+                : Math.min(
+                    matrixData.focusAreas.length - 1,
+                    currentAreaIndex + 1
+                  ); // Swipe left -> next area
 
-          if (nextAreaIndex !== currentAreaIndex) {
-            const nextArea = matrixData.focusAreas[nextAreaIndex];
-            // Simulate click on the next area to navigate
-            onCellClick?.('area', nextArea.id);
+            if (nextAreaIndex !== currentAreaIndex) {
+              const nextArea = matrixData.focusAreas[nextAreaIndex];
+              // Simulate click on the next area to navigate
+              onCellClick?.('area', nextArea.id);
+            }
           }
         }
       }
-    }
 
-    setTouchStart(null);
-    setSwipeStartArea(null);
-  }, [touchStart, swipeStartArea, isMobile, matrixData.focusAreas, onCellClick]);
+      setTouchStart(null);
+      setSwipeStartArea(null);
+    },
+    [touchStart, swipeStartArea, isMobile, matrixData.focusAreas, onCellClick]
+  );
   // Create a 9x9 grid layout
   // Center cell (4,4 in 0-based indexing) is the goal
   // Focus areas are arranged in the 8 surrounding positions
@@ -369,7 +451,9 @@ const Grid: React.FC<GridProps> = ({
               goal={matrixData.goal}
               isSelected={isSelected}
               className={isFocused ? 'ring-2 ring-blue-500' : ''}
-              onClick={(event) => handleCellClick('goal', matrixData.goal.id, event)}
+              onClick={(event) =>
+                handleCellClick('goal', matrixData.goal.id, event)
+              }
             />
           );
         }
@@ -386,13 +470,18 @@ const Grid: React.FC<GridProps> = ({
                 focusArea={focusArea}
                 isSelected={isSelected}
                 className={isFocused ? 'ring-2 ring-green-500' : ''}
-                onClick={(event) => handleCellClick('area', focusArea.id, event)}
+                onClick={(event) =>
+                  handleCellClick('area', focusArea.id, event)
+                }
               />
             );
           } else {
             // Empty cell if focus area doesn't exist
             cellElement = (
-              <div key={cellKey} className="bg-gray-100 border-gray-200 rounded-md" />
+              <div
+                key={cellKey}
+                className="bg-gray-100 border-gray-200 rounded-md"
+              />
             );
           }
         }
@@ -415,7 +504,10 @@ const Grid: React.FC<GridProps> = ({
           } else {
             // Empty cell
             cellElement = (
-              <div key={cellKey} className="bg-gray-100 border-gray-200 rounded-md" />
+              <div
+                key={cellKey}
+                className="bg-gray-100 border-gray-200 rounded-md"
+              />
             );
           }
         }
@@ -426,7 +518,6 @@ const Grid: React.FC<GridProps> = ({
 
     return cells;
   };
-
 
   // Mobile layout: accordion-style focus areas with tasks
   if (isMobile) {
@@ -446,7 +537,9 @@ const Grid: React.FC<GridProps> = ({
             id={matrixData.goal.id}
             goal={matrixData.goal}
             isSelected={isCellSelected(matrixData.goal.id)}
-            onClick={(event) => handleCellClick('goal', matrixData.goal.id, event)}
+            onClick={(event) =>
+              handleCellClick('goal', matrixData.goal.id, event)
+            }
             className="min-h-[120px]"
           />
         </div>
@@ -454,10 +547,17 @@ const Grid: React.FC<GridProps> = ({
         {/* Mobile focus areas as accordion sections */}
         <div className="divide-y divide-gray-200/30">
           {matrixData.focusAreas.map((focusArea, index) => {
-            const areaTasks = matrixData.tasks.filter(task => task.areaId === focusArea.id);
+            const areaTasks = matrixData.tasks.filter(
+              (task) => task.areaId === focusArea.id
+            );
             const isAreaSelected = isCellSelected(focusArea.id);
-            const selectedTasksInArea = areaTasks.filter(task => isCellSelected(task.id));
-            const areaProgress = calculateAreaProgress(matrixData, focusArea.id);
+            const selectedTasksInArea = areaTasks.filter((task) =>
+              isCellSelected(task.id)
+            );
+            const areaProgress = calculateAreaProgress(
+              matrixData,
+              focusArea.id
+            );
 
             return (
               <details key={focusArea.id} className="group">
@@ -471,21 +571,38 @@ const Grid: React.FC<GridProps> = ({
                       id={focusArea.id}
                       focusArea={focusArea}
                       isSelected={isAreaSelected}
-                      onClick={(event) => handleCellClick('area', focusArea.id, event)}
+                      onClick={(event) =>
+                        handleCellClick('area', focusArea.id, event)
+                      }
                       className="flex-1 mr-3 min-h-[60px]"
                     />
                     <div className="flex items-center space-x-2 text-sm text-gray-500">
                       <span>{areaTasks.length} tasks</span>
-                      <span>{selectedTasksInArea.length > 0 && `(${selectedTasksInArea.length} selected)`}</span>
-                      <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <span>
+                        {selectedTasksInArea.length > 0 &&
+                          `(${selectedTasksInArea.length} selected)`}
+                      </span>
+                      <svg
+                        className="w-5 h-5 transition-transform group-open:rotate-180"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     </div>
                   </div>
                   {/* Progress bar for focus area */}
                   <div className="mt-2 px-2">
                     <AreaProgressBar
-                      completed={areaTasks.filter(t => t.status === 'completed').length}
+                      completed={
+                        areaTasks.filter((t) => t.status === 'completed').length
+                      }
                       total={areaTasks.length}
                       areaTitle=""
                       size="sm"
@@ -502,7 +619,9 @@ const Grid: React.FC<GridProps> = ({
                       id={task.id}
                       task={task}
                       isSelected={isCellSelected(task.id)}
-                      onClick={(event) => handleCellClick('task', task.id, event)}
+                      onClick={(event) =>
+                        handleCellClick('task', task.id, event)
+                      }
                       className="min-h-[100px] w-full touch-manipulation"
                     />
                   ))}
@@ -561,7 +680,8 @@ const Grid: React.FC<GridProps> = ({
           <div className="fixed bottom-4 left-4 right-4 z-50">
             <div className="bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center justify-between">
               <span className="text-sm">
-                Selected: {internalSelectedIds.length} cell{internalSelectedIds.length !== 1 ? 's' : ''}
+                Selected: {internalSelectedIds.length} cell
+                {internalSelectedIds.length !== 1 ? 's' : ''}
               </span>
               <button
                 onClick={() => updateSelection([])}
@@ -588,7 +708,7 @@ const Grid: React.FC<GridProps> = ({
         <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 min-w-[300px]">
           <ProgressBar
             progress={overallProgress}
-            label={`Overall Progress (${matrixData.tasks.filter(t => t.status === 'completed').length}/${matrixData.tasks.length} tasks)`}
+            label={`Overall Progress (${matrixData.tasks.filter((t) => t.status === 'completed').length}/${matrixData.tasks.length} tasks)`}
             size="md"
             className="w-full"
           />
@@ -639,7 +759,7 @@ const Grid: React.FC<GridProps> = ({
           maxHeight: '900px',
           transform: `scale(${zoomLevel}) translate(${panOffset.x / zoomLevel}px, ${panOffset.y / zoomLevel}px)`,
           transformOrigin: 'center center',
-          transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+          transition: isDragging ? 'none' : 'transform 0.1s ease-out',
         }}
         role="grid"
         aria-label="Harada Method 64-task matrix"
@@ -659,14 +779,15 @@ const Grid: React.FC<GridProps> = ({
         {/* Grid lines for better structure */}
         <div className="absolute inset-0 grid grid-cols-9 grid-rows-9 gap-1 sm:gap-2 pointer-events-none">
           {Array.from({ length: 81 }).map((_, index) => (
-            <div key={index} className="border border-gray-200/20 rounded-lg"></div>
+            <div
+              key={index}
+              className="border border-gray-200/20 rounded-lg"
+            ></div>
           ))}
         </div>
 
         {/* Render the actual grid cells */}
-        <div className="relative z-10 contents">
-          {renderGrid()}
-        </div>
+        <div className="relative z-10 contents">{renderGrid()}</div>
 
         {/* Zoom cursor indicator when zoomed */}
         {zoomLevel > 1 && (
@@ -680,7 +801,10 @@ const Grid: React.FC<GridProps> = ({
       {internalSelectedIds.length > 0 && (
         <div className="absolute -bottom-12 left-0 right-0 text-center">
           <div className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm rounded-full shadow-lg">
-            <span className="mr-2">Selected: {internalSelectedIds.length} cell{internalSelectedIds.length !== 1 ? 's' : ''}</span>
+            <span className="mr-2">
+              Selected: {internalSelectedIds.length} cell
+              {internalSelectedIds.length !== 1 ? 's' : ''}
+            </span>
             <button
               onClick={() => updateSelection([])}
               className="ml-2 text-blue-200 hover:text-white text-xs underline"
@@ -717,7 +841,7 @@ function isFocusAreaPosition(row: number, col: number): boolean {
     (row === 2 && col === 2) || // Top-left
     (row === 2 && col === 6) || // Top-right
     (row === 6 && col === 2) || // Bottom-left
-    (row === 6 && col === 6)    // Bottom-right
+    (row === 6 && col === 6) // Bottom-right
   );
 }
 
@@ -768,7 +892,10 @@ function getTaskIndex(row: number, col: number): number {
 /**
  * Get the grid position (row, col) for a given cell ID
  */
-function getCellPosition(cellId: string, matrixData: MatrixData): { row: number; col: number } | null {
+function getCellPosition(
+  cellId: string,
+  matrixData: MatrixData
+): { row: number; col: number } | null {
   // Check goal cell
   if (cellId === matrixData.goal.id) {
     return { row: 4, col: 4 };
@@ -807,7 +934,11 @@ function getCellPosition(cellId: string, matrixData: MatrixData): { row: number;
  * Get all cell IDs in a range from startCellId to endCellId
  * This is a simplified implementation for range selection
  */
-function getCellRange(startCellId: string, endCellId: string, matrixData: MatrixData): string[] {
+function getCellRange(
+  startCellId: string,
+  endCellId: string,
+  matrixData: MatrixData
+): string[] {
   const startPos = getCellPosition(startCellId, matrixData);
   const endPos = getCellPosition(endCellId, matrixData);
 
@@ -841,7 +972,11 @@ function getCellId(row: number, col: number): string {
 /**
  * Get the cell type for a given grid position
  */
-function getCellType(row: number, col: number, matrixData: MatrixData): 'goal' | 'area' | 'task' | 'empty' {
+function getCellType(
+  row: number,
+  col: number,
+  matrixData: MatrixData
+): 'goal' | 'area' | 'task' | 'empty' {
   // Center cell (4,4) - Goal
   if (row === 4 && col === 4) {
     return 'goal';

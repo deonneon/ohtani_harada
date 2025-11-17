@@ -5,7 +5,7 @@ import {
   Task,
   TaskStatus,
   CreateFocusAreaInput,
-  CreateTaskInput
+  CreateTaskInput,
 } from './types';
 import { createFocusArea, createTask } from './factories';
 
@@ -19,7 +19,11 @@ import { createFocusArea, createTask } from './factories';
 /**
  * Update goal properties
  */
-export function updateGoal(matrixData: MatrixData, goalId: string, updates: Partial<Pick<Goal, 'title' | 'description'>>): MatrixData {
+export function updateGoal(
+  matrixData: MatrixData,
+  goalId: string,
+  updates: Partial<Pick<Goal, 'title' | 'description'>>
+): MatrixData {
   if (matrixData.goal.id !== goalId) {
     throw new Error(`Goal with id ${goalId} not found`);
   }
@@ -28,8 +32,8 @@ export function updateGoal(matrixData: MatrixData, goalId: string, updates: Part
     ...matrixData,
     goal: {
       ...matrixData.goal,
-      ...updates
-    }
+      ...updates,
+    },
   };
 }
 
@@ -38,8 +42,14 @@ export function updateGoal(matrixData: MatrixData, goalId: string, updates: Part
 /**
  * Update focus area properties
  */
-export function updateFocusArea(matrixData: MatrixData, areaId: string, updates: Partial<Pick<FocusArea, 'title' | 'description'>>): MatrixData {
-  const areaIndex = matrixData.focusAreas.findIndex(area => area.id === areaId);
+export function updateFocusArea(
+  matrixData: MatrixData,
+  areaId: string,
+  updates: Partial<Pick<FocusArea, 'title' | 'description'>>
+): MatrixData {
+  const areaIndex = matrixData.focusAreas.findIndex(
+    (area) => area.id === areaId
+  );
   if (areaIndex === -1) {
     throw new Error(`Focus area with id ${areaId} not found`);
   }
@@ -47,32 +57,38 @@ export function updateFocusArea(matrixData: MatrixData, areaId: string, updates:
   const updatedFocusAreas = [...matrixData.focusAreas];
   updatedFocusAreas[areaIndex] = {
     ...updatedFocusAreas[areaIndex],
-    ...updates
+    ...updates,
   };
 
   return {
     ...matrixData,
-    focusAreas: updatedFocusAreas
+    focusAreas: updatedFocusAreas,
   };
 }
 
 /**
  * Add a new focus area to the matrix
  */
-export function addFocusArea(matrixData: MatrixData, input: CreateFocusAreaInput): MatrixData {
+export function addFocusArea(
+  matrixData: MatrixData,
+  input: CreateFocusAreaInput
+): MatrixData {
   const newFocusArea = createFocusArea(input);
 
   return {
     ...matrixData,
-    focusAreas: [...matrixData.focusAreas, newFocusArea]
+    focusAreas: [...matrixData.focusAreas, newFocusArea],
   };
 }
 
 /**
  * Delete a focus area and all its associated tasks
  */
-export function deleteFocusArea(matrixData: MatrixData, areaId: string): MatrixData {
-  const areaExists = matrixData.focusAreas.some(area => area.id === areaId);
+export function deleteFocusArea(
+  matrixData: MatrixData,
+  areaId: string
+): MatrixData {
+  const areaExists = matrixData.focusAreas.some((area) => area.id === areaId);
   if (!areaExists) {
     throw new Error(`Focus area with id ${areaId} not found`);
   }
@@ -80,8 +96,8 @@ export function deleteFocusArea(matrixData: MatrixData, areaId: string): MatrixD
   // Remove the focus area and all its tasks
   return {
     ...matrixData,
-    focusAreas: matrixData.focusAreas.filter(area => area.id !== areaId),
-    tasks: matrixData.tasks.filter(task => task.areaId !== areaId)
+    focusAreas: matrixData.focusAreas.filter((area) => area.id !== areaId),
+    tasks: matrixData.tasks.filter((task) => task.areaId !== areaId),
   };
 }
 
@@ -90,9 +106,14 @@ export function deleteFocusArea(matrixData: MatrixData, areaId: string): MatrixD
 /**
  * Add a new task to the matrix
  */
-export function addTask(matrixData: MatrixData, input: CreateTaskInput): MatrixData {
+export function addTask(
+  matrixData: MatrixData,
+  input: CreateTaskInput
+): MatrixData {
   // Validate that the focus area exists
-  const areaExists = matrixData.focusAreas.some(area => area.id === input.areaId);
+  const areaExists = matrixData.focusAreas.some(
+    (area) => area.id === input.areaId
+  );
   if (!areaExists) {
     throw new Error(`Focus area with id ${input.areaId} not found`);
   }
@@ -101,15 +122,19 @@ export function addTask(matrixData: MatrixData, input: CreateTaskInput): MatrixD
 
   return {
     ...matrixData,
-    tasks: [...matrixData.tasks, newTask]
+    tasks: [...matrixData.tasks, newTask],
   };
 }
 
 /**
  * Update task properties
  */
-export function updateTask(matrixData: MatrixData, taskId: string, updates: Partial<Pick<Task, 'title' | 'description' | 'status'>>): MatrixData {
-  const taskIndex = matrixData.tasks.findIndex(task => task.id === taskId);
+export function updateTask(
+  matrixData: MatrixData,
+  taskId: string,
+  updates: Partial<Pick<Task, 'title' | 'description' | 'status'>>
+): MatrixData {
+  const taskIndex = matrixData.tasks.findIndex((task) => task.id === taskId);
   if (taskIndex === -1) {
     throw new Error(`Task with id ${taskId} not found`);
   }
@@ -124,7 +149,10 @@ export function updateTask(matrixData: MatrixData, taskId: string, updates: Part
   }
 
   // If status is being changed from completed to something else, clear completedDate
-  if (existingTask.status === TaskStatus.COMPLETED && updates.status !== TaskStatus.COMPLETED) {
+  if (
+    existingTask.status === TaskStatus.COMPLETED &&
+    updates.status !== TaskStatus.COMPLETED
+  ) {
     updatedTask.completedDate = undefined;
   }
 
@@ -132,14 +160,18 @@ export function updateTask(matrixData: MatrixData, taskId: string, updates: Part
 
   return {
     ...matrixData,
-    tasks: updatedTasks
+    tasks: updatedTasks,
   };
 }
 
 /**
  * Update task status (convenience function)
  */
-export function updateTaskStatus(matrixData: MatrixData, taskId: string, status: TaskStatus): MatrixData {
+export function updateTaskStatus(
+  matrixData: MatrixData,
+  taskId: string,
+  status: TaskStatus
+): MatrixData {
   return updateTask(matrixData, taskId, { status });
 }
 
@@ -147,14 +179,14 @@ export function updateTaskStatus(matrixData: MatrixData, taskId: string, status:
  * Delete a task from the matrix
  */
 export function deleteTask(matrixData: MatrixData, taskId: string): MatrixData {
-  const taskExists = matrixData.tasks.some(task => task.id === taskId);
+  const taskExists = matrixData.tasks.some((task) => task.id === taskId);
   if (!taskExists) {
     throw new Error(`Task with id ${taskId} not found`);
   }
 
   return {
     ...matrixData,
-    tasks: matrixData.tasks.filter(task => task.id !== taskId)
+    tasks: matrixData.tasks.filter((task) => task.id !== taskId),
   };
 }
 
@@ -163,29 +195,41 @@ export function deleteTask(matrixData: MatrixData, taskId: string): MatrixData {
 /**
  * Find a focus area by ID
  */
-export function findFocusArea(matrixData: MatrixData, areaId: string): FocusArea | undefined {
-  return matrixData.focusAreas.find(area => area.id === areaId);
+export function findFocusArea(
+  matrixData: MatrixData,
+  areaId: string
+): FocusArea | undefined {
+  return matrixData.focusAreas.find((area) => area.id === areaId);
 }
 
 /**
  * Find a task by ID
  */
-export function findTask(matrixData: MatrixData, taskId: string): Task | undefined {
-  return matrixData.tasks.find(task => task.id === taskId);
+export function findTask(
+  matrixData: MatrixData,
+  taskId: string
+): Task | undefined {
+  return matrixData.tasks.find((task) => task.id === taskId);
 }
 
 /**
  * Find all tasks for a specific focus area
  */
-export function findTasksByArea(matrixData: MatrixData, areaId: string): Task[] {
-  return matrixData.tasks.filter(task => task.areaId === areaId);
+export function findTasksByArea(
+  matrixData: MatrixData,
+  areaId: string
+): Task[] {
+  return matrixData.tasks.filter((task) => task.areaId === areaId);
 }
 
 /**
  * Find tasks by status
  */
-export function findTasksByStatus(matrixData: MatrixData, status: TaskStatus): Task[] {
-  return matrixData.tasks.filter(task => task.status === status);
+export function findTasksByStatus(
+  matrixData: MatrixData,
+  status: TaskStatus
+): Task[] {
+  return matrixData.tasks.filter((task) => task.status === status);
 }
 
 /**
@@ -193,20 +237,27 @@ export function findTasksByStatus(matrixData: MatrixData, status: TaskStatus): T
  */
 export function searchTasks(matrixData: MatrixData, query: string): Task[] {
   const lowerQuery = query.toLowerCase();
-  return matrixData.tasks.filter(task =>
-    task.title.toLowerCase().includes(lowerQuery) ||
-    task.description.toLowerCase().includes(lowerQuery)
+  return matrixData.tasks.filter(
+    (task) =>
+      task.title.toLowerCase().includes(lowerQuery) ||
+      task.description.toLowerCase().includes(lowerQuery)
   );
 }
 
 /**
  * Get tasks with their associated focus area information
  */
-export function getTasksWithAreas(matrixData: MatrixData): Array<Task & { focusArea: FocusArea }> {
-  return matrixData.tasks.map(task => {
-    const focusArea = matrixData.focusAreas.find(area => area.id === task.areaId);
+export function getTasksWithAreas(
+  matrixData: MatrixData
+): Array<Task & { focusArea: FocusArea }> {
+  return matrixData.tasks.map((task) => {
+    const focusArea = matrixData.focusAreas.find(
+      (area) => area.id === task.areaId
+    );
     if (!focusArea) {
-      throw new Error(`Task ${task.id} references non-existent focus area ${task.areaId}`);
+      throw new Error(
+        `Task ${task.id} references non-existent focus area ${task.areaId}`
+      );
     }
     return { ...task, focusArea };
   });
@@ -225,20 +276,23 @@ export function getTaskCount(matrixData: MatrixData): number {
  * Get completed task count
  */
 export function getCompletedTaskCount(matrixData: MatrixData): number {
-  return matrixData.tasks.filter(task => task.status === TaskStatus.COMPLETED).length;
+  return matrixData.tasks.filter((task) => task.status === TaskStatus.COMPLETED)
+    .length;
 }
 
 /**
  * Get task count by status
  */
-export function getTaskCountByStatus(matrixData: MatrixData): Record<TaskStatus, number> {
+export function getTaskCountByStatus(
+  matrixData: MatrixData
+): Record<TaskStatus, number> {
   const counts = {
     [TaskStatus.PENDING]: 0,
     [TaskStatus.IN_PROGRESS]: 0,
-    [TaskStatus.COMPLETED]: 0
+    [TaskStatus.COMPLETED]: 0,
   };
 
-  matrixData.tasks.forEach(task => {
+  matrixData.tasks.forEach((task) => {
     counts[task.status]++;
   });
 
@@ -248,11 +302,15 @@ export function getTaskCountByStatus(matrixData: MatrixData): Record<TaskStatus,
 /**
  * Get task count by focus area
  */
-export function getTaskCountByArea(matrixData: MatrixData): Record<string, number> {
+export function getTaskCountByArea(
+  matrixData: MatrixData
+): Record<string, number> {
   const counts: Record<string, number> = {};
 
-  matrixData.focusAreas.forEach(area => {
-    counts[area.id] = matrixData.tasks.filter(task => task.areaId === area.id).length;
+  matrixData.focusAreas.forEach((area) => {
+    counts[area.id] = matrixData.tasks.filter(
+      (task) => task.areaId === area.id
+    ).length;
   });
 
   return counts;
@@ -261,28 +319,37 @@ export function getTaskCountByArea(matrixData: MatrixData): Record<string, numbe
 /**
  * Validate matrix data integrity
  */
-export function validateMatrixIntegrity(matrixData: MatrixData): { isValid: boolean; errors: string[] } {
+export function validateMatrixIntegrity(matrixData: MatrixData): {
+  isValid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
 
   // Check that all focus areas reference the goal
-  matrixData.focusAreas.forEach(area => {
+  matrixData.focusAreas.forEach((area) => {
     if (area.goalId !== matrixData.goal.id) {
-      errors.push(`Focus area ${area.id} references non-existent goal ${area.goalId}`);
+      errors.push(
+        `Focus area ${area.id} references non-existent goal ${area.goalId}`
+      );
     }
   });
 
   // Check that all tasks reference existing focus areas
-  matrixData.tasks.forEach(task => {
-    const areaExists = matrixData.focusAreas.some(area => area.id === task.areaId);
+  matrixData.tasks.forEach((task) => {
+    const areaExists = matrixData.focusAreas.some(
+      (area) => area.id === task.areaId
+    );
     if (!areaExists) {
-      errors.push(`Task ${task.id} references non-existent focus area ${task.areaId}`);
+      errors.push(
+        `Task ${task.id} references non-existent focus area ${task.areaId}`
+      );
     }
   });
 
   // Check for duplicate IDs
   const goalIds = new Set([matrixData.goal.id]);
-  const areaIds = new Set(matrixData.focusAreas.map(a => a.id));
-  const taskIds = new Set(matrixData.tasks.map(t => t.id));
+  const areaIds = new Set(matrixData.focusAreas.map((a) => a.id));
+  const taskIds = new Set(matrixData.tasks.map((t) => t.id));
 
   if (goalIds.size !== 1) {
     errors.push('Multiple goals with same ID found');
@@ -298,6 +365,6 @@ export function validateMatrixIntegrity(matrixData: MatrixData): { isValid: bool
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }

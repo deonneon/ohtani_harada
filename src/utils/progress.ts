@@ -1,4 +1,5 @@
-import { MatrixData, TaskStatus, Task, FocusArea } from '../types';
+import type { MatrixData } from '../types';
+import { TaskStatus } from '../types';
 
 /**
  * Progress calculation utilities for the Harada Method matrix
@@ -16,7 +17,7 @@ export function calculateAreaProgress(
   if (tasks.length === 0) return 0;
 
   const completedTasks = tasks.filter(
-    (task) => task.status === TaskStatus.Completed
+    (task) => task.status === TaskStatus.COMPLETED
   ).length;
   return Math.round((completedTasks / tasks.length) * 100);
 }
@@ -30,7 +31,7 @@ export function calculateOverallProgress(matrixData: MatrixData): number {
   if (totalTasks === 0) return 0;
 
   const completedTasks = matrixData.tasks.filter(
-    (task) => task.status === TaskStatus.Completed
+    (task) => task.status === TaskStatus.COMPLETED
   ).length;
   return Math.round((completedTasks / totalTasks) * 100);
 }
@@ -57,20 +58,20 @@ export function getProgressStats(matrixData: MatrixData): ProgressStats {
   const tasks = matrixData.tasks;
 
   const completed = tasks.filter(
-    (task) => task.status === TaskStatus.Completed
+    (task) => task.status === TaskStatus.COMPLETED
   ).length;
   const inProgress = tasks.filter(
-    (task) => task.status === TaskStatus.InProgress
+    (task) => task.status === TaskStatus.IN_PROGRESS
   ).length;
   const pending = tasks.filter(
-    (task) => task.status === TaskStatus.Pending
+    (task) => task.status === TaskStatus.PENDING
   ).length;
   const total = tasks.length;
 
   const areaBreakdown = matrixData.focusAreas.map((area) => {
     const areaTasks = tasks.filter((task) => task.areaId === area.id);
     const areaCompleted = areaTasks.filter(
-      (task) => task.status === TaskStatus.Completed
+      (task) => task.status === TaskStatus.COMPLETED
     ).length;
 
     return {
@@ -148,11 +149,11 @@ export function getMilestoneProgress(matrixData: MatrixData): {
  */
 export function getTaskStatusColor(status: TaskStatus): string {
   switch (status) {
-    case TaskStatus.Completed:
+    case TaskStatus.COMPLETED:
       return 'bg-green-500';
-    case TaskStatus.InProgress:
+    case TaskStatus.IN_PROGRESS:
       return 'bg-blue-500';
-    case TaskStatus.Pending:
+    case TaskStatus.PENDING:
     default:
       return 'bg-gray-300';
   }
@@ -163,11 +164,11 @@ export function getTaskStatusColor(status: TaskStatus): string {
  */
 export function getTaskStatusTextColor(status: TaskStatus): string {
   switch (status) {
-    case TaskStatus.Completed:
+    case TaskStatus.COMPLETED:
       return 'text-green-700';
-    case TaskStatus.InProgress:
+    case TaskStatus.IN_PROGRESS:
       return 'text-blue-700';
-    case TaskStatus.Pending:
+    case TaskStatus.PENDING:
     default:
       return 'text-gray-500';
   }

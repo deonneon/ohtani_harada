@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Goal, CreateGoalInput, FocusArea, CreateFocusAreaInput, MatrixData } from '../types';
+import {
+  Goal,
+  CreateGoalInput,
+  FocusArea,
+  CreateFocusAreaInput,
+  MatrixData,
+} from '../types';
 
 interface SetupWizardProps {
   /** Whether the wizard is open */
@@ -7,7 +13,10 @@ interface SetupWizardProps {
   /** Current matrix data */
   matrixData: MatrixData;
   /** Callback when wizard completes */
-  onComplete: (goalData: CreateGoalInput, areasData: CreateFocusAreaInput[]) => void;
+  onComplete: (
+    goalData: CreateGoalInput,
+    areasData: CreateFocusAreaInput[]
+  ) => void;
   /** Callback when wizard is closed */
   onClose: () => void;
 }
@@ -28,13 +37,16 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({
   isOpen,
   matrixData,
   onComplete,
-  onClose
+  onClose,
 }) => {
   const [state, setState] = useState<WizardState>({
     currentStep: 'welcome',
     goalData: null,
-    areasData: Array.from({ length: 8 }, () => ({ title: '', description: '' })),
-    completedSteps: new Set()
+    areasData: Array.from({ length: 8 }, () => ({
+      title: '',
+      description: '',
+    })),
+    completedSteps: new Set(),
   });
 
   // Reset wizard when opened
@@ -43,15 +55,18 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({
       setState({
         currentStep: 'welcome',
         goalData: null,
-        areasData: Array.from({ length: 8 }, () => ({ title: '', description: '' })),
-        completedSteps: new Set()
+        areasData: Array.from({ length: 8 }, () => ({
+          title: '',
+          description: '',
+        })),
+        completedSteps: new Set(),
       });
     }
   }, [isOpen]);
 
   // Navigation functions
   const goToStep = (step: WizardStep) => {
-    setState(prev => ({ ...prev, currentStep: step }));
+    setState((prev) => ({ ...prev, currentStep: step }));
   };
 
   const nextStep = () => {
@@ -59,10 +74,10 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({
     const currentIndex = steps.indexOf(state.currentStep);
     if (currentIndex < steps.length - 1) {
       const nextStep = steps[currentIndex + 1];
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         currentStep: nextStep,
-        completedSteps: new Set([...prev.completedSteps, prev.currentStep])
+        completedSteps: new Set([...prev.completedSteps, prev.currentStep]),
       }));
     }
   };
@@ -81,17 +96,19 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({
   };
 
   const canProceedFromAreas = () => {
-    return state.areasData.every(area => area.title.trim() && area.description.trim());
+    return state.areasData.every(
+      (area) => area.title.trim() && area.description.trim()
+    );
   };
 
   // Handlers
   const handleGoalSubmit = (goalData: CreateGoalInput) => {
-    setState(prev => ({ ...prev, goalData }));
+    setState((prev) => ({ ...prev, goalData }));
     nextStep();
   };
 
   const handleAreasSubmit = (areasData: CreateFocusAreaInput[]) => {
-    setState(prev => ({ ...prev, areasData }));
+    setState((prev) => ({ ...prev, areasData }));
     nextStep();
   };
 
@@ -136,8 +153,18 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({
               className="text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Close wizard"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -154,16 +181,22 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({
           <div className="flex justify-between mt-2">
             {steps.map((step, index) => (
               <div key={step} className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                  index <= currentIndex
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                    index <= currentIndex
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-500'
+                  }`}
+                >
                   {index + 1}
                 </div>
-                <span className={`text-xs mt-1 ${
-                  index <= currentIndex ? 'text-blue-600 font-medium' : 'text-gray-500'
-                }`}>
+                <span
+                  className={`text-xs mt-1 ${
+                    index <= currentIndex
+                      ? 'text-blue-600 font-medium'
+                      : 'text-gray-500'
+                  }`}
+                >
                   {step === 'welcome' && 'Welcome'}
                   {step === 'goal' && 'Your Goal'}
                   {step === 'areas' && 'Focus Areas'}
@@ -246,54 +279,88 @@ const WelcomeStep: React.FC = () => (
   <div className="p-8">
     <div className="text-center mb-8">
       <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        <svg
+          className="w-8 h-8 text-white"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fillRule="evenodd"
+            d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clipRule="evenodd"
+          />
         </svg>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-2">Welcome to the Harada Method</h3>
-      <p className="text-lg text-gray-600">Inspired by Shohei Ohtani's systematic approach to excellence</p>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        Welcome to the Harada Method
+      </h3>
+      <p className="text-lg text-gray-600">
+        Inspired by Shohei Ohtani's systematic approach to excellence
+      </p>
     </div>
 
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="bg-blue-50 p-6 rounded-lg">
-        <h4 className="text-lg font-semibold text-blue-900 mb-3">How It Works</h4>
+        <h4 className="text-lg font-semibold text-blue-900 mb-3">
+          How It Works
+        </h4>
         <div className="space-y-3 text-blue-800">
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">1</div>
+            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+              1
+            </div>
             <div>
               <strong>Define Your Central Goal</strong>
-              <p className="text-sm mt-1">Set an ambitious, specific goal that inspires and challenges you.</p>
+              <p className="text-sm mt-1">
+                Set an ambitious, specific goal that inspires and challenges
+                you.
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">2</div>
+            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+              2
+            </div>
             <div>
               <strong>Identify 8 Focus Areas</strong>
-              <p className="text-sm mt-1">Break down your goal into 8 key areas that need development.</p>
+              <p className="text-sm mt-1">
+                Break down your goal into 8 key areas that need development.
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">3</div>
+            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+              3
+            </div>
             <div>
               <strong>Create 64 Actionable Tasks</strong>
-              <p className="text-sm mt-1">Develop 8 specific tasks for each focus area (64 total).</p>
+              <p className="text-sm mt-1">
+                Develop 8 specific tasks for each focus area (64 total).
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">4</div>
+            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+              4
+            </div>
             <div>
               <strong>Systematic Progress</strong>
-              <p className="text-sm mt-1">Work simultaneously across all areas for compound growth.</p>
+              <p className="text-sm mt-1">
+                Work simultaneously across all areas for compound growth.
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="bg-green-50 p-6 rounded-lg">
-        <h4 className="text-lg font-semibold text-green-900 mb-2">Why It Works</h4>
+        <h4 className="text-lg font-semibold text-green-900 mb-2">
+          Why It Works
+        </h4>
         <p className="text-green-800">
-          Just as Ohtani didn't just "practice harder" but systematically developed every aspect of his game,
-          the Harada Method ensures comprehensive development across all necessary areas. This creates
+          Just as Ohtani didn't just "practice harder" but systematically
+          developed every aspect of his game, the Harada Method ensures
+          comprehensive development across all necessary areas. This creates
           compound growth that leads to extraordinary results.
         </p>
       </div>
@@ -310,14 +377,18 @@ const GoalStep: React.FC<{
 }> = ({ initialData, onSubmit }) => {
   const [title, setTitle] = useState(initialData.title);
   const [description, setDescription] = useState(initialData.description);
-  const [errors, setErrors] = useState<{title?: string; description?: string}>({});
+  const [errors, setErrors] = useState<{
+    title?: string;
+    description?: string;
+  }>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: {title?: string; description?: string} = {};
+    const newErrors: { title?: string; description?: string } = {};
     if (!title.trim()) newErrors.title = 'Goal title is required';
-    if (!description.trim()) newErrors.description = 'Goal description is required';
+    if (!description.trim())
+      newErrors.description = 'Goal description is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -330,14 +401,20 @@ const GoalStep: React.FC<{
   return (
     <div className="p-8">
       <div className="max-w-2xl mx-auto">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Define Your Central Goal</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          Define Your Central Goal
+        </h3>
         <p className="text-gray-600 mb-6">
-          This is the big vision that will guide everything else. Make it specific, ambitious, and inspiring.
+          This is the big vision that will guide everything else. Make it
+          specific, ambitious, and inspiring.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="wizard-goal-title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="wizard-goal-title"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Goal Title *
             </label>
             <input
@@ -346,15 +423,22 @@ const GoalStep: React.FC<{
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-                errors.title ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                errors.title
+                  ? 'border-red-300 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
               }`}
               placeholder="e.g., Become a Professional Baseball Player"
             />
-            {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+            {errors.title && (
+              <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="wizard-goal-description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="wizard-goal-description"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Goal Description *
             </label>
             <textarea
@@ -363,18 +447,30 @@ const GoalStep: React.FC<{
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 resize-none ${
-                errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                errors.description
+                  ? 'border-red-300 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
               }`}
               placeholder="Describe your goal in detail. What does success look like?"
             />
-            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+            {errors.description && (
+              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+            )}
           </div>
 
           <div className="bg-blue-50 p-4 rounded-md">
-            <h4 className="text-sm font-medium text-blue-900 mb-2">💡 Examples</h4>
+            <h4 className="text-sm font-medium text-blue-900 mb-2">
+              💡 Examples
+            </h4>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• "Build a sustainable software company serving 10,000 customers"</li>
-              <li>• "Become a world-class concert pianist performing internationally"</li>
+              <li>
+                • "Build a sustainable software company serving 10,000
+                customers"
+              </li>
+              <li>
+                • "Become a world-class concert pianist performing
+                internationally"
+              </li>
               <li>• "Complete an Ironman triathlon in under 12 hours"</li>
             </ul>
           </div>
@@ -392,18 +488,24 @@ const AreasStep: React.FC<{
   onSubmit: (data: CreateFocusAreaInput[]) => void;
 }> = ({ initialData, onSubmit }) => {
   const [areas, setAreas] = useState<CreateFocusAreaInput[]>(initialData);
-  const [errors, setErrors] = useState<Record<number, {title?: string; description?: string}>>({});
+  const [errors, setErrors] = useState<
+    Record<number, { title?: string; description?: string }>
+  >({});
 
-  const updateArea = (index: number, field: 'title' | 'description', value: string) => {
-    setAreas(prev => prev.map((area, i) =>
-      i === index ? { ...area, [field]: value } : area
-    ));
+  const updateArea = (
+    index: number,
+    field: 'title' | 'description',
+    value: string
+  ) => {
+    setAreas((prev) =>
+      prev.map((area, i) => (i === index ? { ...area, [field]: value } : area))
+    );
 
     // Clear errors
     if (errors[index]?.[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [index]: { ...prev[index], [field]: undefined }
+        [index]: { ...prev[index], [field]: undefined },
       }));
     }
   };
@@ -411,9 +513,10 @@ const AreasStep: React.FC<{
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: Record<number, {title?: string; description?: string}> = {};
+    const newErrors: Record<number, { title?: string; description?: string }> =
+      {};
     areas.forEach((area, index) => {
-      const areaErrors: {title?: string; description?: string} = {};
+      const areaErrors: { title?: string; description?: string } = {};
       if (!area.title.trim()) areaErrors.title = 'Required';
       if (!area.description.trim()) areaErrors.description = 'Required';
 
@@ -433,16 +536,24 @@ const AreasStep: React.FC<{
   return (
     <div className="p-8">
       <div className="max-w-4xl mx-auto">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Define Your 8 Focus Areas</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          Define Your 8 Focus Areas
+        </h3>
         <p className="text-gray-600 mb-6">
-          Break down your goal into 8 key areas that need systematic development.
+          Break down your goal into 8 key areas that need systematic
+          development.
         </p>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {areas.map((area, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">Area {index + 1}</h4>
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg p-4"
+              >
+                <h4 className="font-medium text-gray-900 mb-3">
+                  Area {index + 1}
+                </h4>
 
                 <div className="space-y-3">
                   <div>
@@ -452,14 +563,20 @@ const AreasStep: React.FC<{
                     <input
                       type="text"
                       value={area.title}
-                      onChange={(e) => updateArea(index, 'title', e.target.value)}
+                      onChange={(e) =>
+                        updateArea(index, 'title', e.target.value)
+                      }
                       className={`w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 ${
-                        errors[index]?.title ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                        errors[index]?.title
+                          ? 'border-red-300 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
                       }`}
                       placeholder="e.g., Physical Conditioning"
                     />
                     {errors[index]?.title && (
-                      <p className="mt-1 text-xs text-red-600">{errors[index]?.title}</p>
+                      <p className="mt-1 text-xs text-red-600">
+                        {errors[index]?.title}
+                      </p>
                     )}
                   </div>
 
@@ -469,15 +586,21 @@ const AreasStep: React.FC<{
                     </label>
                     <textarea
                       value={area.description}
-                      onChange={(e) => updateArea(index, 'description', e.target.value)}
+                      onChange={(e) =>
+                        updateArea(index, 'description', e.target.value)
+                      }
                       rows={2}
                       className={`w-full px-2 py-1 text-sm border rounded resize-none focus:outline-none focus:ring-1 ${
-                        errors[index]?.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                        errors[index]?.description
+                          ? 'border-red-300 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
                       }`}
                       placeholder="What does this area encompass?"
                     />
                     {errors[index]?.description && (
-                      <p className="mt-1 text-xs text-red-600">{errors[index]?.description}</p>
+                      <p className="mt-1 text-xs text-red-600">
+                        {errors[index]?.description}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -486,10 +609,13 @@ const AreasStep: React.FC<{
           </div>
 
           <div className="bg-green-50 p-4 rounded-md">
-            <h4 className="text-sm font-medium text-green-900 mb-2">🎯 Remember</h4>
+            <h4 className="text-sm font-medium text-green-900 mb-2">
+              🎯 Remember
+            </h4>
             <p className="text-sm text-green-800">
-              Each focus area will become a "lane" in your 64-task matrix. Think about the different skills,
-              knowledge areas, and support systems needed to achieve your goal.
+              Each focus area will become a "lane" in your 64-task matrix. Think
+              about the different skills, knowledge areas, and support systems
+              needed to achieve your goal.
             </p>
           </div>
         </form>
@@ -509,9 +635,12 @@ const ReviewStep: React.FC<{
 }> = ({ goalData, areasData, onEditGoal, onEditAreas }) => (
   <div className="p-8">
     <div className="max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-900 mb-2">Review Your Setup</h3>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        Review Your Setup
+      </h3>
       <p className="text-gray-600 mb-6">
-        Take a moment to review your goal and focus areas before completing the setup.
+        Take a moment to review your goal and focus areas before completing the
+        setup.
       </p>
 
       {/* Goal Review */}
@@ -532,7 +661,9 @@ const ReviewStep: React.FC<{
       {/* Areas Review */}
       <div className="bg-green-50 p-6 rounded-lg mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-lg font-semibold text-green-900">Your Focus Areas</h4>
+          <h4 className="text-lg font-semibold text-green-900">
+            Your Focus Areas
+          </h4>
           <button
             onClick={onEditAreas}
             className="text-green-600 hover:text-green-800 text-sm font-medium"
@@ -552,12 +683,25 @@ const ReviewStep: React.FC<{
 
       {/* Next Steps */}
       <div className="bg-yellow-50 p-6 rounded-lg">
-        <h4 className="text-lg font-semibold text-yellow-900 mb-3">What's Next?</h4>
+        <h4 className="text-lg font-semibold text-yellow-900 mb-3">
+          What's Next?
+        </h4>
         <div className="text-yellow-800 space-y-2">
-          <p>🎯 <strong>Your 64-task matrix is ready!</strong></p>
-          <p>📝 Next, you'll create 8 specific, actionable tasks for each focus area.</p>
-          <p>⚡ Then you'll systematically work across all areas simultaneously for compound growth.</p>
-          <p>🏆 Just like Ohtani's revolutionary two-way success, you'll develop extraordinary capabilities.</p>
+          <p>
+            🎯 <strong>Your 64-task matrix is ready!</strong>
+          </p>
+          <p>
+            📝 Next, you'll create 8 specific, actionable tasks for each focus
+            area.
+          </p>
+          <p>
+            ⚡ Then you'll systematically work across all areas simultaneously
+            for compound growth.
+          </p>
+          <p>
+            🏆 Just like Ohtani's revolutionary two-way success, you'll develop
+            extraordinary capabilities.
+          </p>
         </div>
       </div>
     </div>

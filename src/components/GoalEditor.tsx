@@ -20,18 +20,21 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
   isOpen,
   goal,
   onClose,
-  onSave
+  onSave,
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [errors, setErrors] = useState<{title?: string; description?: string}>({});
+  const [errors, setErrors] = useState<{
+    title?: string;
+    description?: string;
+  }>({});
 
   // Auto-save functionality
   const formData = { title, description };
   const autoSave = useAutoSave(formData, {
     storageKey: `goal-editor-${goal?.id || 'new'}`,
     delay: 1500, // Save after 1.5 seconds of inactivity
-    enabled: isOpen
+    enabled: isOpen,
   });
   const { saveStatus, saveStatusText } = useAutoSaveIndicator(autoSave);
 
@@ -40,7 +43,12 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
     if (isOpen) {
       // Load from goal or auto-saved draft
       const savedData = autoSave.savedData;
-      if (savedData && (!goal || goal.title === savedData.title && goal.description === savedData.description)) {
+      if (
+        savedData &&
+        (!goal ||
+          (goal.title === savedData.title &&
+            goal.description === savedData.description))
+      ) {
         // Use saved draft if it exists and matches current goal (or no goal set)
         setTitle(savedData.title || '');
         setDescription(savedData.description || '');
@@ -57,7 +65,7 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: {title?: string; description?: string} = {};
+    const newErrors: { title?: string; description?: string } = {};
 
     // Validation
     if (!title.trim()) {
@@ -80,7 +88,7 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
     // Save the goal
     onSave({
       title: title.trim(),
-      description: description.trim()
+      description: description.trim(),
     });
 
     // Clear auto-saved draft on successful save
@@ -142,8 +150,18 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
             className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Close modal"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -164,15 +182,21 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.title ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                errors.title
+                  ? 'border-red-300 focus:ring-red-500'
+                  : 'border-gray-300'
               }`}
               placeholder="e.g., Become a Professional Baseball Player"
               maxLength={100}
-              aria-describedby={errors.title ? "title-error" : undefined}
+              aria-describedby={errors.title ? 'title-error' : undefined}
               aria-invalid={!!errors.title}
             />
             {errors.title && (
-              <p id="title-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="title-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.title}
               </p>
             )}
@@ -195,15 +219,23 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical ${
-                errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                errors.description
+                  ? 'border-red-300 focus:ring-red-500'
+                  : 'border-gray-300'
               }`}
               placeholder="Describe your goal in detail. What does success look like? Why is this important to you?"
               maxLength={500}
-              aria-describedby={errors.description ? "description-error" : undefined}
+              aria-describedby={
+                errors.description ? 'description-error' : undefined
+              }
               aria-invalid={!!errors.description}
             />
             {errors.description && (
-              <p id="description-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="description-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.description}
               </p>
             )}
@@ -219,15 +251,18 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
             </h3>
             <div className="space-y-2 text-sm text-blue-800">
               <p>
-                <strong>Like Shohei Ohtani:</strong> His goal wasn't just "play baseball" - it was to become a two-way
-                superstar who revolutionized the sport through unprecedented performance.
+                <strong>Like Shohei Ohtani:</strong> His goal wasn't just "play
+                baseball" - it was to become a two-way superstar who
+                revolutionized the sport through unprecedented performance.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                 <div>
                   <h4 className="font-medium mb-1">✅ Good Examples:</h4>
                   <ul className="text-xs space-y-1">
                     <li>• "Become a world-class software architect"</li>
-                    <li>• "Build a sustainable business serving 10K customers"</li>
+                    <li>
+                      • "Build a sustainable business serving 10K customers"
+                    </li>
                     <li>• "Master advanced mathematics and physics"</li>
                   </ul>
                 </div>
@@ -241,7 +276,8 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
                 </div>
               </div>
               <p className="mt-2 text-xs italic">
-                Your goal should inspire you, challenge you, and be specific enough to break down into actionable steps.
+                Your goal should inspire you, challenge you, and be specific
+                enough to break down into actionable steps.
               </p>
             </div>
           </div>
@@ -259,16 +295,32 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
             )}
             {saveStatus === 'saved' && (
               <div className="flex items-center gap-2 text-green-600">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <span>{saveStatusText}</span>
               </div>
             )}
             {saveStatus === 'unsaved' && autoSave.savedData && (
               <div className="flex items-center gap-2 text-orange-600">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <span>Draft available</span>
               </div>

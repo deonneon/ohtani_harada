@@ -21,7 +21,7 @@ const AREA_ICONS: Record<string, string> = {
   'Performance Execution': '⚡',
   'Recovery & Maintenance': '🔄',
   'Relationship Building': '🤝',
-  'Personal Growth': '🌱'
+  'Personal Growth': '🌱',
 };
 
 /**
@@ -38,9 +38,10 @@ const AreaHeaderCell: React.FC<AreaHeaderCellProps> = ({
   const areaClasses = `
     bg-gradient-to-br from-emerald-400 via-green-500 to-teal-600
     text-white shadow-lg border-2 border-green-300/40
-    ${isSelected
-      ? 'from-emerald-500 via-green-600 to-teal-700 shadow-xl ring-3 ring-green-300/60 scale-105'
-      : 'hover:from-emerald-500 hover:via-green-600 hover:to-teal-700 hover:shadow-xl hover:scale-102'
+    ${
+      isSelected
+        ? 'from-emerald-500 via-green-600 to-teal-700 shadow-xl ring-3 ring-green-300/60 scale-105'
+        : 'hover:from-emerald-500 hover:via-green-600 hover:to-teal-700 hover:shadow-xl hover:scale-102'
     }
     transition-all duration-300 ease-out
     ${className}
@@ -62,7 +63,11 @@ const AreaHeaderCell: React.FC<AreaHeaderCellProps> = ({
         <div className="absolute inset-0 bg-white/15 rounded-md"></div>
 
         {/* Area icon with enhanced styling */}
-        <div className="text-2xl mb-2 drop-shadow-md relative z-10" role="img" aria-label={`${focusArea.title} icon`}>
+        <div
+          className="text-2xl mb-2 drop-shadow-md relative z-10"
+          role="img"
+          aria-label={`${focusArea.title} icon`}
+        >
           {icon}
         </div>
 

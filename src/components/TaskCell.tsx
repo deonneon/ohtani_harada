@@ -14,46 +14,52 @@ interface TaskCellProps extends Omit<CellProps, 'children'> {
 /**
  * Status indicators for tasks
  */
-const STATUS_INDICATORS: Record<TaskStatus, { icon: string; color: string; label: string }> = {
+const STATUS_INDICATORS: Record<
+  TaskStatus,
+  { icon: string; color: string; label: string }
+> = {
   [TaskStatus.PENDING]: {
     icon: '⏳',
     color: 'text-gray-500',
-    label: 'Pending'
+    label: 'Pending',
   },
   [TaskStatus.IN_PROGRESS]: {
     icon: '🔄',
     color: 'text-blue-600',
-    label: 'In Progress'
+    label: 'In Progress',
   },
   [TaskStatus.COMPLETED]: {
     icon: '✅',
     color: 'text-green-600',
-    label: 'Completed'
-  }
+    label: 'Completed',
+  },
 };
 
 /**
  * Priority indicators for tasks
  */
-const PRIORITY_INDICATORS: Record<TaskPriority, { icon: string; color: string; label: string; bgColor: string }> = {
+const PRIORITY_INDICATORS: Record<
+  TaskPriority,
+  { icon: string; color: string; label: string; bgColor: string }
+> = {
   [TaskPriority.LOW]: {
     icon: '🔵',
     color: 'text-blue-600',
     label: 'Low',
-    bgColor: 'bg-blue-100'
+    bgColor: 'bg-blue-100',
   },
   [TaskPriority.MEDIUM]: {
     icon: '🟡',
     color: 'text-yellow-600',
     label: 'Medium',
-    bgColor: 'bg-yellow-100'
+    bgColor: 'bg-yellow-100',
   },
   [TaskPriority.HIGH]: {
     icon: '🔴',
     color: 'text-red-600',
     label: 'High',
-    bgColor: 'bg-red-100'
-  }
+    bgColor: 'bg-red-100',
+  },
 };
 
 /**
@@ -73,9 +79,10 @@ const TaskCell: React.FC<TaskCellProps> = ({
   const taskClasses = `
     bg-gradient-to-br from-amber-100 via-yellow-200 to-orange-200
     text-gray-900 border-2 border-yellow-300/60 shadow-sm
-    ${isSelected
-      ? 'from-amber-200 via-yellow-300 to-orange-300 border-yellow-400 shadow-lg ring-2 ring-yellow-400/40 scale-105'
-      : 'hover:from-amber-200 hover:via-yellow-300 hover:to-orange-300 hover:shadow-md hover:scale-102'
+    ${
+      isSelected
+        ? 'from-amber-200 via-yellow-300 to-orange-300 border-yellow-400 shadow-lg ring-2 ring-yellow-400/40 scale-105'
+        : 'hover:from-amber-200 hover:via-yellow-300 hover:to-orange-300 hover:shadow-md hover:scale-102'
     }
     transition-all duration-300 ease-out
     ${className}

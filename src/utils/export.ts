@@ -1,6 +1,10 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { MatrixData, calculateOverallProgress, calculateAreaProgress } from './progress';
+import {
+  MatrixData,
+  calculateOverallProgress,
+  calculateAreaProgress,
+} from './progress';
 
 /**
  * Export options for different formats
@@ -29,15 +33,20 @@ export const DEFAULT_EXPORT_OPTIONS: ExportOptions = {
   includeFooter: true,
   contentType: 'full',
   quality: 0.95,
-  title: 'Harada Method Matrix'
+  title: 'Harada Method Matrix',
 };
 
 /**
  * Generate a timestamped filename for export
  */
-export function generateExportFilename(format: 'png' | 'jpeg' | 'pdf', title?: string): string {
+export function generateExportFilename(
+  format: 'png' | 'jpeg' | 'pdf',
+  title?: string
+): string {
   const timestamp = new Date().toISOString().slice(0, 16).replace(/[:.]/g, '-');
-  const baseName = (title || 'harada-matrix').toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const baseName = (title || 'harada-matrix')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-');
   return `${baseName}-${timestamp}.${format}`;
 }
 
@@ -58,22 +67,25 @@ export async function exportAsImage(
     });
 
     // Convert canvas to blob
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        throw new Error('Failed to generate image blob');
-      }
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          throw new Error('Failed to generate image blob');
+        }
 
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = generateExportFilename(options.format, options.title);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }, `image/${options.format}`, options.quality);
-
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = generateExportFilename(options.format, options.title);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      },
+      `image/${options.format}`,
+      options.quality
+    );
   } catch (error) {
     console.error('Image export failed:', error);
     throw new Error('Failed to export image. Please try again.');
@@ -91,7 +103,7 @@ export async function exportAsPDF(
     const pdf = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
-      format: 'a4'
+      format: 'a4',
     });
 
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -109,13 +121,19 @@ export async function exportAsPDF(
       // Add date
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, margin, yPosition);
+      pdf.text(
+        `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+        margin,
+        yPosition
+      );
       yPosition += 10;
     }
 
     // Add summary statistics
     const overallProgress = calculateOverallProgress(matrixData);
-    const completedTasks = matrixData.tasks.filter(t => t.status === 'completed').length;
+    const completedTasks = matrixData.tasks.filter(
+      (t) => t.status === 'completed'
+    ).length;
     const totalTasks = matrixData.tasks.length;
 
     pdf.setFontSize(12);
@@ -125,7 +143,11 @@ export async function exportAsPDF(
 
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(10);
-    pdf.text(`Overall Progress: ${Math.round(overallProgress * 100)}% (${completedTasks}/${totalTasks} tasks)`, margin, yPosition);
+    pdf.text(
+      `Overall Progress: ${Math.round(overallProgress * 100)}% (${completedTasks}/${totalTasks} tasks)`,
+      margin,
+      yPosition
+    );
     yPosition += 6;
     pdf.text(`Focus Areas: ${matrixData.focusAreas.length}`, margin, yPosition);
     yPosition += 6;
@@ -143,7 +165,10 @@ export async function exportAsPDF(
       pdf.setFont('helvetica', 'normal');
 
       // Split goal description into lines that fit the page width
-      const goalLines = pdf.splitTextToSize(matrixData.goal.description, pageWidth - 2 * margin);
+      const goalLines = pdf.splitTextToSize(
+        matrixData.goal.description,
+        pageWidth - 2 * margin
+      );
       pdf.text(goalLines, margin, yPosition);
       yPosition += goalLines.length * 5 + 5;
     }
@@ -171,13 +196,22 @@ export async function exportAsPDF(
         pdf.setFont('helvetica', 'normal');
 
         const areaProgress = calculateAreaProgress(matrixData, area.id);
-        const areaTasks = matrixData.tasks.filter(t => t.areaId === area.id);
-        const completedAreaTasks = areaTasks.filter(t => t.status === 'completed').length;
+        const areaTasks = matrixData.tasks.filter((t) => t.areaId === area.id);
+        const completedAreaTasks = areaTasks.filter(
+          (t) => t.status === 'completed'
+        ).length;
 
-        pdf.text(`Progress: ${Math.round(areaProgress * 100)}% (${completedAreaTasks}/${areaTasks.length} tasks)`, margin + 5, yPosition);
+        pdf.text(
+          `Progress: ${Math.round(areaProgress * 100)}% (${completedAreaTasks}/${areaTasks.length} tasks)`,
+          margin + 5,
+          yPosition
+        );
         yPosition += 5;
 
-        const descriptionLines = pdf.splitTextToSize(area.description, pageWidth - 2 * margin - 5);
+        const descriptionLines = pdf.splitTextToSize(
+          area.description,
+          pageWidth - 2 * margin - 5
+        );
         pdf.text(descriptionLines, margin + 5, yPosition);
         yPosition += descriptionLines.length * 4 + 3;
 
@@ -188,22 +222,39 @@ export async function exportAsPDF(
           pdf.text('Tasks:', margin + 10, yPosition);
           yPosition += 5;
 
-          areaTasks.forEach(task => {
+          areaTasks.forEach((task) => {
             // Check if we need a new page
             if (yPosition > pageHeight - 20) {
               pdf.addPage();
               yPosition = margin;
             }
 
-            const statusIcon = task.status === 'completed' ? '✓' : task.status === 'in-progress' ? '→' : '○';
-            const priorityIcon = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🔵';
+            const statusIcon =
+              task.status === 'completed'
+                ? '✓'
+                : task.status === 'in-progress'
+                  ? '→'
+                  : '○';
+            const priorityIcon =
+              task.priority === 'high'
+                ? '🔴'
+                : task.priority === 'medium'
+                  ? '🟡'
+                  : '🔵';
 
             pdf.setFont('helvetica', 'normal');
-            pdf.text(`${statusIcon} ${priorityIcon} ${task.title}`, margin + 15, yPosition);
+            pdf.text(
+              `${statusIcon} ${priorityIcon} ${task.title}`,
+              margin + 15,
+              yPosition
+            );
 
             if (task.description) {
               yPosition += 4;
-              const taskDescLines = pdf.splitTextToSize(task.description, pageWidth - 2 * margin - 20);
+              const taskDescLines = pdf.splitTextToSize(
+                task.description,
+                pageWidth - 2 * margin - 20
+              );
               pdf.setFontSize(9);
               pdf.text(taskDescLines, margin + 20, yPosition);
               yPosition += taskDescLines.length * 3.5;
@@ -221,22 +272,31 @@ export async function exportAsPDF(
 
     // Add completed tasks summary
     if (options.contentType === 'completed-only') {
-      const completedTasks = matrixData.tasks.filter(t => t.status === 'completed');
+      const completedTasks = matrixData.tasks.filter(
+        (t) => t.status === 'completed'
+      );
 
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
       pdf.text(`Completed Tasks (${completedTasks.length})`, margin, yPosition);
       yPosition += 8;
 
-      completedTasks.forEach(task => {
+      completedTasks.forEach((task) => {
         // Check if we need a new page
         if (yPosition > pageHeight - 20) {
           pdf.addPage();
           yPosition = margin;
         }
 
-        const areaName = matrixData.focusAreas.find(a => a.id === task.areaId)?.title || 'Unknown Area';
-        const priorityIcon = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🔵';
+        const areaName =
+          matrixData.focusAreas.find((a) => a.id === task.areaId)?.title ||
+          'Unknown Area';
+        const priorityIcon =
+          task.priority === 'high'
+            ? '🔴'
+            : task.priority === 'medium'
+              ? '🟡'
+              : '🔵';
 
         pdf.setFontSize(11);
         pdf.setFont('helvetica', 'bold');
@@ -249,7 +309,10 @@ export async function exportAsPDF(
         yPosition += 4;
 
         if (task.description) {
-          const taskDescLines = pdf.splitTextToSize(task.description, pageWidth - 2 * margin - 5);
+          const taskDescLines = pdf.splitTextToSize(
+            task.description,
+            pageWidth - 2 * margin - 5
+          );
           pdf.text(taskDescLines, margin + 5, yPosition);
           yPosition += taskDescLines.length * 3.5 + 2;
         }
@@ -257,7 +320,11 @@ export async function exportAsPDF(
         if (task.completedDate) {
           pdf.setFontSize(8);
           pdf.setTextColor(100, 100, 100);
-          pdf.text(`Completed: ${task.completedDate.toLocaleDateString()}`, margin + 5, yPosition);
+          pdf.text(
+            `Completed: ${task.completedDate.toLocaleDateString()}`,
+            margin + 5,
+            yPosition
+          );
           pdf.setTextColor(0, 0, 0);
           yPosition += 4;
         }
@@ -285,7 +352,6 @@ export async function exportAsPDF(
 
     // Save the PDF
     pdf.save(generateExportFilename('pdf', options.title));
-
   } catch (error) {
     console.error('PDF export failed:', error);
     throw new Error('Failed to export PDF. Please try again.');

@@ -24,9 +24,10 @@ const GoalCell: React.FC<GoalCellProps> = ({
   const goalClasses = `
     bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700
     text-white shadow-xl border-2 border-blue-400/30
-    ${isSelected
-      ? 'from-blue-600 via-blue-700 to-indigo-800 shadow-2xl ring-4 ring-blue-300/50 scale-105'
-      : 'hover:from-blue-600 hover:via-blue-700 hover:to-indigo-800 hover:shadow-2xl hover:scale-102'
+    ${
+      isSelected
+        ? 'from-blue-600 via-blue-700 to-indigo-800 shadow-2xl ring-4 ring-blue-300/50 scale-105'
+        : 'hover:from-blue-600 hover:via-blue-700 hover:to-indigo-800 hover:shadow-2xl hover:scale-102'
     }
     transition-all duration-300 ease-out
     ${className}
@@ -45,7 +46,11 @@ const GoalCell: React.FC<GoalCellProps> = ({
         <div className="absolute inset-0 bg-white/10 rounded-md opacity-50"></div>
 
         {/* Goal icon/emoji with glow effect */}
-        <div className="text-3xl mb-3 drop-shadow-lg relative z-10" role="img" aria-label="Target">
+        <div
+          className="text-3xl mb-3 drop-shadow-lg relative z-10"
+          role="img"
+          aria-label="Target"
+        >
           🎯
         </div>
 

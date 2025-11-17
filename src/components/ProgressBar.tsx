@@ -22,23 +22,23 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   size = 'md',
   showPercentage = true,
   className = '',
-  barClassName = ''
+  barClassName = '',
 }) => {
   const clampedProgress = Math.max(0, Math.min(100, progress));
 
   const sizeClasses = {
     sm: {
       container: 'h-2',
-      text: 'text-xs'
+      text: 'text-xs',
     },
     md: {
       container: 'h-3',
-      text: 'text-sm'
+      text: 'text-sm',
     },
     lg: {
       container: 'h-4',
-      text: 'text-base'
-    }
+      text: 'text-base',
+    },
   };
 
   const barColor = getProgressBarColor(clampedProgress);
@@ -47,18 +47,24 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className={`w-full ${className}`}>
       {label && (
         <div className="flex justify-between items-center mb-1">
-          <span className={`font-medium text-gray-700 ${sizeClasses[size].text}`}>
+          <span
+            className={`font-medium text-gray-700 ${sizeClasses[size].text}`}
+          >
             {label}
           </span>
           {showPercentage && (
-            <span className={`font-semibold text-gray-600 ${sizeClasses[size].text}`}>
+            <span
+              className={`font-semibold text-gray-600 ${sizeClasses[size].text}`}
+            >
               {clampedProgress}%
             </span>
           )}
         </div>
       )}
 
-      <div className={`w-full bg-gray-200 rounded-full overflow-hidden ${sizeClasses[size].container}`}>
+      <div
+        className={`w-full bg-gray-200 rounded-full overflow-hidden ${sizeClasses[size].container}`}
+      >
         <div
           className={`h-full transition-all duration-300 ease-out rounded-full ${barColor} ${barClassName}`}
           style={{ width: `${clampedProgress}%` }}
@@ -67,7 +73,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {!label && showPercentage && (
         <div className="flex justify-center mt-1">
-          <span className={`font-semibold text-gray-600 ${sizeClasses[size].text}`}>
+          <span
+            className={`font-semibold text-gray-600 ${sizeClasses[size].text}`}
+          >
             {clampedProgress}%
           </span>
         </div>

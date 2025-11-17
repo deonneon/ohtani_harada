@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Goal, CreateGoalInput } from '../types';
+import { type Goal, type CreateGoalInput } from '../types';
 import { useAutoSave, useAutoSaveIndicator } from '../utils';
 
 interface GoalEditorProps {

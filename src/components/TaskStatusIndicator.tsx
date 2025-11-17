@@ -35,7 +35,7 @@ export const TaskStatusIndicator: React.FC<TaskStatusIndicatorProps> = ({
 
   const getStatusConfig = (status: TaskStatus) => {
     switch (status) {
-      case TaskStatus.Completed:
+      case TaskStatus.COMPLETED:
         return {
           color: getTaskStatusColor(status),
           textColor: getTaskStatusTextColor(status),
@@ -54,7 +54,7 @@ export const TaskStatusIndicator: React.FC<TaskStatusIndicatorProps> = ({
             </svg>
           ),
         };
-      case TaskStatus.InProgress:
+      case TaskStatus.IN_PROGRESS:
         return {
           color: getTaskStatusColor(status),
           textColor: getTaskStatusTextColor(status),
@@ -67,7 +67,7 @@ export const TaskStatusIndicator: React.FC<TaskStatusIndicatorProps> = ({
             </div>
           ),
         };
-      case TaskStatus.Pending:
+      case TaskStatus.PENDING:
       default:
         return {
           color: getTaskStatusColor(status),
@@ -132,17 +132,17 @@ export const TaskStatusBadge: React.FC<TaskStatusIndicatorProps> = ({
   className = '',
 }) => {
   const config = {
-    [TaskStatus.Completed]: {
+    [TaskStatus.COMPLETED]: {
       bgColor: 'bg-green-100',
       textColor: 'text-green-800',
       text: '✓ Done',
     },
-    [TaskStatus.InProgress]: {
+    [TaskStatus.IN_PROGRESS]: {
       bgColor: 'bg-blue-100',
       textColor: 'text-blue-800',
       text: '⋯ Working',
     },
-    [TaskStatus.Pending]: {
+    [TaskStatus.PENDING]: {
       bgColor: 'bg-gray-100',
       textColor: 'text-gray-700',
       text: '○ Pending',

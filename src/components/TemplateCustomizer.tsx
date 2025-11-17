@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MatrixData, CreateGoalInput, CreateFocusAreaInput } from '../types';
+import { type MatrixData, type CreateGoalInput, type CreateFocusAreaInput } from '../types';
 
 interface TemplateCustomizerProps {
   templateData: MatrixData;

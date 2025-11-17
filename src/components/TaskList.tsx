@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task, TaskStatus, TaskPriority } from '../types';
+import { type Task, TaskStatus, TaskPriority } from '../types';
 
 interface TaskListProps {
   /** The tasks to display */

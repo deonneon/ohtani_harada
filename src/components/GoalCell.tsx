@@ -1,6 +1,6 @@
 import React from 'react';
-import { Goal } from '../utils';
-import Cell, { CellProps } from './Cell';
+import { type Goal } from '../utils';
+import Cell, { type CellProps } from './Cell';
 
 /**
  * Props specific to GoalCell

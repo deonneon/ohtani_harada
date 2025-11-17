@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
-  MatrixData,
+  type MatrixData,
   TaskStatus,
   getProgressStats,
   calculateStreak,
@@ -78,7 +78,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
       const areaStat = areaStats.get(task.areaId);
       if (areaStat) {
         areaStat.total++;
-        if (task.status === TaskStatus.Completed) {
+        if (task.status === TaskStatus.COMPLETED) {
           areaStat.completed++;
         }
       }
@@ -89,9 +89,9 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
 
   const statusOptions: Array<{ value: TaskStatus | 'all'; label: string }> = [
     { value: 'all', label: 'All Status' },
-    { value: TaskStatus.Pending, label: 'Pending' },
-    { value: TaskStatus.InProgress, label: 'In Progress' },
-    { value: TaskStatus.Completed, label: 'Completed' },
+    { value: TaskStatus.PENDING, label: 'Pending' },
+    { value: TaskStatus.IN_PROGRESS, label: 'In Progress' },
+    { value: TaskStatus.COMPLETED, label: 'Completed' },
   ];
 
   const areaOptions = [
@@ -160,7 +160,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
           <StatCard
             title="Completed"
             value={
-              filteredTasks.filter((t) => t.status === TaskStatus.Completed)
+              filteredTasks.filter((t) => t.status === TaskStatus.COMPLETED)
                 .length
             }
             subtitle={`${stats.overallPercentage}% complete`}
@@ -170,7 +170,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
           <StatCard
             title="In Progress"
             value={
-              filteredTasks.filter((t) => t.status === TaskStatus.InProgress)
+              filteredTasks.filter((t) => t.status === TaskStatus.IN_PROGRESS)
                 .length
             }
             color="bg-yellow-600"
@@ -230,12 +230,12 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
                   <p className="text-2xl font-bold text-red-900">
                     {
                       filteredTasks.filter(
-                        (t) => t.status === TaskStatus.Pending
+                        (t) => t.status === TaskStatus.PENDING
                       ).length
                     }
                   </p>
                 </div>
-                <TaskStatusBadge status={TaskStatus.Pending} />
+                <TaskStatusBadge status={TaskStatus.PENDING} />
               </div>
             </div>
 
@@ -248,12 +248,12 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
                   <p className="text-2xl font-bold text-yellow-900">
                     {
                       filteredTasks.filter(
-                        (t) => t.status === TaskStatus.InProgress
+                        (t) => t.status === TaskStatus.IN_PROGRESS
                       ).length
                     }
                   </p>
                 </div>
-                <TaskStatusBadge status={TaskStatus.InProgress} />
+                <TaskStatusBadge status={TaskStatus.IN_PROGRESS} />
               </div>
             </div>
 
@@ -266,12 +266,12 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
                   <p className="text-2xl font-bold text-green-900">
                     {
                       filteredTasks.filter(
-                        (t) => t.status === TaskStatus.Completed
+                        (t) => t.status === TaskStatus.COMPLETED
                       ).length
                     }
                   </p>
                 </div>
-                <TaskStatusBadge status={TaskStatus.Completed} />
+                <TaskStatusBadge status={TaskStatus.COMPLETED} />
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Task, FocusArea } from '../types';
+import { type Task, type FocusArea } from '../types';
 import { TaskList } from './TaskList';
 
 interface TaskOrganizerProps {

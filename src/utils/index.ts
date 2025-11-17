@@ -7,7 +7,12 @@ export type {
   CreateGoalInput,
   CreateFocusAreaInput,
   CreateTaskInput,
+} from '../types';
+
+// Value exports (enums used as values)
+export {
   TaskStatus,
+  TaskPriority,
 } from '../types';
 
 // Additional type exports from storage

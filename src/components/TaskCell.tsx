@@ -1,6 +1,6 @@
 import React from 'react';
-import { Task, TaskStatus, TaskPriority } from '../utils';
-import Cell, { CellProps } from './Cell';
+import { type Task, TaskStatus, TaskPriority } from '../utils';
+import Cell, { type CellProps } from './Cell';
 import { TaskStatusIndicator } from './TaskStatusIndicator';
 
 /**

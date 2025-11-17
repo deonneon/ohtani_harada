@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Task, CreateTaskInput, TaskStatus, TaskPriority } from '../types';
+import { type Task, type CreateTaskInput, TaskStatus, TaskPriority } from '../types';
 
 // Mobile detection hook
 const useIsMobile = () => {

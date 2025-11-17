@@ -1,6 +1,6 @@
 import React from 'react';
-import { FocusArea } from '../utils';
-import Cell, { CellProps } from './Cell';
+import { type FocusArea } from '../utils';
+import Cell, { type CellProps } from './Cell';
 
 /**
  * Props specific to AreaHeaderCell

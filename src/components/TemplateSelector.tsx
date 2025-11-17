@@ -4,7 +4,7 @@ import {
   TemplateMetadata,
   getTemplateById,
 } from '../templates';
-import { MatrixData } from '../types';
+import { type MatrixData } from '../types';
 import TemplateCustomizer from './TemplateCustomizer';
 
 interface TemplateSelectorProps {

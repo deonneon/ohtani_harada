@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
-  Goal,
-  CreateGoalInput,
-  FocusArea,
-  CreateFocusAreaInput,
-  MatrixData,
+  type Goal,
+  type CreateGoalInput,
+  type FocusArea,
+  type CreateFocusAreaInput,
+  type MatrixData,
 } from '../types';
 
 interface SetupWizardProps {

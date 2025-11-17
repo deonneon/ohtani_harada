@@ -1,4 +1,4 @@
-import { MatrixData, TaskStatus, TaskPriority } from '../types';
+import { type MatrixData, TaskStatus, TaskPriority } from '../types';
 
 export const sportsProfessionalAthleteTemplate: MatrixData = {
   goal: {

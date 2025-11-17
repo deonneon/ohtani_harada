@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FocusArea, CreateFocusAreaInput } from '../types';
+import { type FocusArea, type CreateFocusAreaInput } from '../types';
 import { useAutoSave, useAutoSaveIndicator } from '../utils';
 
 interface FocusAreaEditorProps {

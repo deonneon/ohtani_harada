@@ -100,3 +100,6 @@ export {
 
 // Hook exports
 export { useAutoSave, useAutoSaveIndicator } from '../hooks/useAutoSave';
+
+// Progress utility exports
+export * from './progress';

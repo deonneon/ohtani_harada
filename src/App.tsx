@@ -1,16 +1,51 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Grid, GoalEditor, FocusAreaEditor, SetupWizard, TaskEditor, BatchTaskCreator, TaskOrganizer } from './components';
-import { createEmptyMatrix } from './utils';
+import { Grid, GoalEditor, FocusAreaEditor, SetupWizard, TaskEditor, BatchTaskCreator, TaskOrganizer, RecoveryDialog, StatisticsDashboard, CelebrationModal } from './components';
+import { createEmptyMatrix, calculateOverallProgress, getMilestoneProgress } from './utils';
+import { useAutoSave, useAutoSaveIndicator } from './hooks/useAutoSave';
+import { saveMatrixData, loadMatrixData, hasMatrixData, createBackup, restoreFromBackup, getBackupMetadata, StorageError, StorageCorruptionError } from './utils/storage';
 import { MatrixData, CreateGoalInput, TaskStatus, TaskPriority } from './types';
 
 function App() {
-  // Matrix data state - now mutable so we can update the goal
-  const [matrixData, setMatrixData] = useState<MatrixData>(() =>
-    createEmptyMatrix({
-      title: 'Become a Professional Baseball Player',
-      description: 'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills'
-    })
-  );
+  // Recovery dialog state
+  const [isRecoveryDialogOpen, setIsRecoveryDialogOpen] = useState(false);
+  const [recoveryError, setRecoveryError] = useState<Error | null>(null);
+  const [corruptedData, setCorruptedData] = useState<any>(null);
+
+  // Celebration modal state
+  const [isCelebrationOpen, setIsCelebrationOpen] = useState(false);
+  const [celebrationMilestone, setCelebrationMilestone] = useState(0);
+  const [lastCelebratedMilestone, setLastCelebratedMilestone] = useState(0);
+
+  // Load matrix data from localStorage if available, otherwise create empty matrix
+  const [matrixData, setMatrixData] = useState<MatrixData>(() => {
+    try {
+      const storedData = loadMatrixData();
+      return storedData || createEmptyMatrix({
+        title: 'Become a Professional Baseball Player',
+        description: 'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills'
+      });
+    } catch (error) {
+      console.warn('Failed to load matrix data from storage:', error);
+
+      // Check if we can recover from backup
+      const backupData = restoreFromBackup();
+      if (backupData) {
+        console.info('Recovered data from backup');
+        return backupData;
+      }
+
+      // If no backup, show recovery dialog
+      setRecoveryError(error as Error);
+      setCorruptedData(null); // Could extract corrupted data for manual recovery
+      setIsRecoveryDialogOpen(true);
+
+      // Return empty matrix as fallback
+      return createEmptyMatrix({
+        title: 'Become a Professional Baseball Player',
+        description: 'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills'
+      });
+    }
+  });
 
   const [selectedCellIds, setSelectedCellIds] = useState<string[]>([]);
 
@@ -35,7 +70,72 @@ function App() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
   // View mode state
-  const [viewMode, setViewMode] = useState<'grid' | 'organizer'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'organizer' | 'statistics'>('grid');
+
+  // Auto-save functionality with 500ms debounce
+  const autoSave = useAutoSave(matrixData, {
+    delay: 500, // 500ms as specified in task
+    storageKey: 'ohtani-harada-matrix',
+    onSave: (data) => {
+      try {
+        saveMatrixData(data);
+      } catch (error) {
+        console.error('Failed to save matrix data:', error);
+        // Graceful degradation - data is still in memory
+        // Could show a toast notification here in a full implementation
+        throw error; // Re-throw to let useAutoSave handle the error state
+      }
+    },
+    onError: (error) => {
+      console.error('Auto-save error:', error);
+      // Could implement additional error recovery strategies here
+      // such as retry logic, backup to alternative storage, etc.
+    },
+    enabled: true
+  });
+
+  const { saveStatus, saveStatusText } = useAutoSaveIndicator(autoSave);
+
+  // Create backup on successful saves
+  useEffect(() => {
+    if (saveStatus === 'saved') {
+      // Create backup every few saves or on significant changes
+      // For now, create backup on every successful save (could be optimized)
+      createBackup(matrixData);
+    }
+  }, [saveStatus, matrixData]);
+
+  // Check for milestone celebrations
+  useEffect(() => {
+    const progress = calculateOverallProgress(matrixData);
+    const { currentMilestone } = getMilestoneProgress(matrixData);
+
+    // Check if we've reached a new milestone
+    if (currentMilestone > lastCelebratedMilestone && currentMilestone > 0) {
+      setCelebrationMilestone(currentMilestone);
+      setLastCelebratedMilestone(currentMilestone);
+      setIsCelebrationOpen(true);
+    }
+  }, [matrixData, lastCelebratedMilestone]);
+
+  // Recovery dialog handlers
+  const handleRecovery = useCallback((recoveredData: MatrixData) => {
+    setMatrixData(recoveredData);
+    setIsRecoveryDialogOpen(false);
+    setRecoveryError(null);
+    setCorruptedData(null);
+  }, []);
+
+  const handleCloseRecovery = useCallback(() => {
+    setIsRecoveryDialogOpen(false);
+    setRecoveryError(null);
+    setCorruptedData(null);
+  }, []);
+
+  // Celebration modal handlers
+  const handleCloseCelebration = useCallback(() => {
+    setIsCelebrationOpen(false);
+  }, []);
 
   const handleCellClick = (cellType: 'goal' | 'area' | 'task', id: string) => {
     console.log(`Clicked ${cellType}:`, id);
@@ -206,6 +306,7 @@ function App() {
   // View mode handlers
   const switchToGridView = () => setViewMode('grid');
   const switchToOrganizerView = () => setViewMode('organizer');
+  const switchToStatisticsView = () => setViewMode('statistics');
 
   // Keyboard shortcuts handler
   const handleKeyboardShortcuts = useCallback((event: KeyboardEvent) => {
@@ -249,6 +350,12 @@ function App() {
           switchToOrganizerView();
         }
         break;
+      case 's':
+        if (isCtrlOrCmd) {
+          event.preventDefault();
+          switchToStatisticsView();
+        }
+        break;
       case 'f':
         if (isCtrlOrCmd && event.shiftKey) {
           event.preventDefault();
@@ -283,6 +390,7 @@ function App() {
     handleOpenBatchCreator,
     switchToGridView,
     switchToOrganizerView,
+    switchToStatisticsView,
     showKeyboardShortcutsHelp
   ]);
 
@@ -318,14 +426,41 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
+        <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
           Harada Method - Ohtani Matrix
         </h1>
+
+        {/* Save Status Indicator */}
+        <div className="flex justify-center mb-8">
+          <div className={`
+            inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-colors
+            ${saveStatus === 'saving' ? 'bg-yellow-100 text-yellow-800' :
+              saveStatus === 'saved' ? 'bg-green-100 text-green-800' :
+              'bg-gray-100 text-gray-800'}
+          `}>
+            {saveStatus === 'saving' && (
+              <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
+            )}
+            {saveStatus === 'saved' && (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )}
+            {saveStatus === 'error' && (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            )}
+            <span>{saveStatusText}</span>
+          </div>
+        </div>
 
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">
-              {viewMode === 'grid' ? 'Interactive Matrix Grid' : 'Task Organizer'}
+              {viewMode === 'grid' ? 'Interactive Matrix Grid' :
+               viewMode === 'organizer' ? 'Task Organizer' :
+               'Progress Statistics'}
             </h2>
             <div className="flex gap-2">
               <button
@@ -377,7 +512,7 @@ function App() {
                 </button>
                 <button
                   onClick={switchToOrganizerView}
-                  className={`px-3 py-2 text-sm font-medium rounded-r-md transition-colors ${
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
                     viewMode === 'organizer'
                       ? 'bg-blue-600 text-white'
                       : 'bg-white text-gray-700 hover:bg-gray-50'
@@ -385,6 +520,17 @@ function App() {
                   aria-label="Organizer view"
                 >
                   📝 Organizer
+                </button>
+                <button
+                  onClick={switchToStatisticsView}
+                  className={`px-3 py-2 text-sm font-medium rounded-r-md transition-colors ${
+                    viewMode === 'statistics'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                  aria-label="Statistics view"
+                >
+                  📈 Stats
                 </button>
               </div>
               <button
@@ -502,7 +648,7 @@ function App() {
                 onSelectionChange={handleSelectionChange}
                 selectedCellIds={selectedCellIds}
               />
-            ) : (
+            ) : viewMode === 'organizer' ? (
               <div className="w-full max-w-4xl">
                 <TaskOrganizer
                   tasks={filteredTasks}
@@ -511,6 +657,10 @@ function App() {
                   onTaskClick={(task) => handleOpenTaskEditor(task, task.areaId)}
                   dragEnabled={true}
                 />
+              </div>
+            ) : (
+              <div className="w-full max-w-4xl">
+                <StatisticsDashboard matrixData={matrixData} />
               </div>
             )}
           </div>
@@ -601,6 +751,22 @@ function App() {
           onClose={handleCloseSetupWizard}
         />
 
+        {/* Recovery Dialog */}
+        <RecoveryDialog
+          isOpen={isRecoveryDialogOpen}
+          onClose={handleCloseRecovery}
+          onRecover={handleRecovery}
+          error={recoveryError || undefined}
+          corruptedData={corruptedData}
+        />
+
+        {/* Celebration Modal */}
+        <CelebrationModal
+          isOpen={isCelebrationOpen}
+          onClose={handleCloseCelebration}
+          milestone={celebrationMilestone}
+        />
+
         {/* Task Editor Modal */}
         <TaskEditor
           isOpen={isTaskEditorOpen}
@@ -673,6 +839,10 @@ function App() {
                       <div className="flex justify-between">
                         <span>Organizer View</span>
                         <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+O</kbd>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Statistics View</span>
+                        <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl+S</kbd>
                       </div>
                     </div>
                   </div>

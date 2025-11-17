@@ -1,6 +1,7 @@
 import React from 'react';
 import { Task, TaskStatus, TaskPriority } from '../utils';
 import Cell, { CellProps } from './Cell';
+import { TaskStatusIndicator } from './TaskStatusIndicator';
 
 /**
  * Props specific to TaskCell
@@ -105,15 +106,12 @@ const TaskCell: React.FC<TaskCellProps> = ({
         </div>
 
         {/* Status indicator with enhanced styling */}
-        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 shadow-sm mb-2 relative z-10">
-          <div
-            className={`text-sm ${statusInfo.color} font-bold`}
-            role="img"
-            aria-label={`Status: ${statusInfo.label}`}
-            title={statusInfo.label}
-          >
-            {statusInfo.icon}
-          </div>
+        <div className="flex items-center justify-center mb-2 relative z-10">
+          <TaskStatusIndicator
+            status={task.status}
+            size="sm"
+            showText={false}
+          />
         </div>
 
         {/* Task title with better typography */}

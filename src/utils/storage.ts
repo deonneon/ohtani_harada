@@ -182,21 +182,66 @@ export function deserializeMatrixData(storedData: StoredMatrixData): MatrixData 
 }
 
 /**
- * Save matrix data to localStorage
+ * Compress data using simple string compression (removes unnecessary whitespace)
+ */
+function compressData(data: string): string {
+  try {
+    // Use a simple compression approach - minify JSON and encode
+    const compressed = btoa(encodeURIComponent(data));
+    return compressed;
+  } catch (error) {
+    // If compression fails, return original data
+    console.warn('Data compression failed, using uncompressed data:', error);
+    return data;
+  }
+}
+
+/**
+ * Decompress data
+ */
+function decompressData(compressedData: string): string {
+  try {
+    return decodeURIComponent(atob(compressedData));
+  } catch (error) {
+    // If decompression fails, assume data was not compressed
+    console.warn('Data decompression failed, assuming uncompressed data:', error);
+    return compressedData;
+  }
+}
+
+/**
+ * Save matrix data to localStorage with compression and error handling
  */
 export function saveMatrixData(matrixData: MatrixData): void {
   try {
     const serializedData = serializeMatrixData(matrixData);
-    const jsonString = JSON.stringify(serializedData);
+    let jsonString = JSON.stringify(serializedData);
+
+    // Try compression if data is large (> 1MB)
+    let compressed = false;
+    if (jsonString.length > 1024 * 1024) { // 1MB threshold for compression
+      try {
+        const compressedString = compressData(jsonString);
+        // Only use compression if it actually reduces size significantly (>10%)
+        if (compressedString.length < jsonString.length * 0.9) {
+          jsonString = compressedString;
+          compressed = true;
+        }
+      } catch (compressionError) {
+        console.warn('Compression failed, saving uncompressed data:', compressionError);
+      }
+    }
 
     // Check if data will fit in localStorage (rough estimate: 5MB limit)
     if (jsonString.length > 4 * 1024 * 1024) { // 4MB threshold
       throw new StorageQuotaExceededError();
     }
 
+    // Store compression flag and data
     localStorage.setItem(STORAGE_KEYS.MATRIX_DATA, jsonString);
     localStorage.setItem(STORAGE_KEYS.VERSION, STORAGE_VERSION);
     localStorage.setItem(STORAGE_KEYS.LAST_SAVED, serializedData.lastSaved);
+    localStorage.setItem(`${STORAGE_KEYS.MATRIX_DATA}_compressed`, compressed.toString());
 
   } catch (error) {
     if (error instanceof StorageQuotaExceededError) {
@@ -217,17 +262,29 @@ export function saveMatrixData(matrixData: MatrixData): void {
 }
 
 /**
- * Load matrix data from localStorage
+ * Load matrix data from localStorage with decompression support
  */
 export function loadMatrixData(): MatrixData | null {
   try {
     const storedJson = localStorage.getItem(STORAGE_KEYS.MATRIX_DATA);
+    const isCompressed = localStorage.getItem(`${STORAGE_KEYS.MATRIX_DATA}_compressed`) === 'true';
 
     if (!storedJson) {
       return null; // No data stored yet
     }
 
-    const storedData: StoredMatrixData = JSON.parse(storedJson);
+    // Decompress if needed
+    let processedJson = storedJson;
+    if (isCompressed) {
+      try {
+        processedJson = decompressData(storedJson);
+      } catch (decompressionError) {
+        console.warn('Failed to decompress data, trying to load as uncompressed:', decompressionError);
+        // Fall back to trying uncompressed data
+      }
+    }
+
+    const storedData: StoredMatrixData = JSON.parse(processedJson);
     return deserializeMatrixData(storedData);
 
   } catch (error) {
@@ -252,6 +309,7 @@ export function clearMatrixData(): void {
     localStorage.removeItem(STORAGE_KEYS.MATRIX_DATA);
     localStorage.removeItem(STORAGE_KEYS.VERSION);
     localStorage.removeItem(STORAGE_KEYS.LAST_SAVED);
+    localStorage.removeItem(`${STORAGE_KEYS.MATRIX_DATA}_compressed`);
   } catch (error) {
     throw new StorageError('Failed to clear data from localStorage', error as Error);
   }
@@ -294,5 +352,86 @@ export function getStorageUsage(): number {
     return data ? new Blob([data]).size : 0;
   } catch (error) {
     return 0;
+  }
+}
+
+/**
+ * Storage keys for backup functionality
+ */
+export const BACKUP_KEYS = {
+  BACKUP_DATA: 'ohtani-harada-backup-data',
+  BACKUP_TIMESTAMP: 'ohtani-harada-backup-timestamp',
+  BACKUP_VERSION: 'ohtani-harada-backup-version'
+} as const;
+
+/**
+ * Create a backup of current matrix data
+ */
+export function createBackup(matrixData: MatrixData): void {
+  try {
+    const serializedData = serializeMatrixData(matrixData);
+    const jsonString = JSON.stringify(serializedData);
+
+    localStorage.setItem(BACKUP_KEYS.BACKUP_DATA, jsonString);
+    localStorage.setItem(BACKUP_KEYS.BACKUP_TIMESTAMP, new Date().toISOString());
+    localStorage.setItem(BACKUP_KEYS.BACKUP_VERSION, STORAGE_VERSION);
+
+    console.info('Backup created successfully');
+  } catch (error) {
+    console.warn('Failed to create backup:', error);
+  }
+}
+
+/**
+ * Restore from backup data
+ */
+export function restoreFromBackup(): MatrixData | null {
+  try {
+    const backupJson = localStorage.getItem(BACKUP_KEYS.BACKUP_DATA);
+
+    if (!backupJson) {
+      return null; // No backup available
+    }
+
+    const storedData: StoredMatrixData = JSON.parse(backupJson);
+    const restoredData = deserializeMatrixData(storedData);
+
+    console.info('Successfully restored from backup');
+    return restoredData;
+  } catch (error) {
+    console.error('Failed to restore from backup:', error);
+    return null;
+  }
+}
+
+/**
+ * Check if backup exists and get backup metadata
+ */
+export function getBackupMetadata(): { exists: boolean; timestamp: Date | null; version: string | null } {
+  try {
+    const timestamp = localStorage.getItem(BACKUP_KEYS.BACKUP_TIMESTAMP);
+    const version = localStorage.getItem(BACKUP_KEYS.BACKUP_VERSION);
+    const exists = localStorage.getItem(BACKUP_KEYS.BACKUP_DATA) !== null;
+
+    return {
+      exists,
+      timestamp: timestamp ? new Date(timestamp) : null,
+      version
+    };
+  } catch (error) {
+    return { exists: false, timestamp: null, version: null };
+  }
+}
+
+/**
+ * Clear backup data
+ */
+export function clearBackup(): void {
+  try {
+    localStorage.removeItem(BACKUP_KEYS.BACKUP_DATA);
+    localStorage.removeItem(BACKUP_KEYS.BACKUP_TIMESTAMP);
+    localStorage.removeItem(BACKUP_KEYS.BACKUP_VERSION);
+  } catch (error) {
+    console.warn('Failed to clear backup:', error);
   }
 }

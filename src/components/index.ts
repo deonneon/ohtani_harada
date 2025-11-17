@@ -11,6 +11,11 @@ export { TaskEditor } from './TaskEditor';
 export { BatchTaskCreator } from './BatchTaskCreator';
 export { TaskList } from './TaskList';
 export { TaskOrganizer } from './TaskOrganizer';
+export { RecoveryDialog } from './RecoveryDialog';
+export { ProgressBar, AreaProgressBar, MilestoneProgressBar } from './ProgressBar';
+export { TaskStatusIndicator, TaskStatusDot, TaskStatusBadge } from './TaskStatusIndicator';
+export { StatisticsDashboard } from './StatisticsDashboard';
+export { CelebrationModal, AchievementBadge } from './CelebrationModal';
 
 // Re-export cell types
 export type { CellProps } from './Cell';

@@ -1,8 +1,9 @@
 import React from 'react';
-import { MatrixData } from '../utils';
+import { MatrixData, calculateAreaProgress, calculateOverallProgress } from '../utils';
 import GoalCell from './GoalCell';
 import AreaHeaderCell from './AreaHeaderCell';
 import TaskCell from './TaskCell';
+import { ProgressBar, AreaProgressBar } from './ProgressBar';
 
 /**
  * Props for the Grid component
@@ -393,23 +394,36 @@ const Grid: React.FC<GridProps> = ({
             const areaTasks = matrixData.tasks.filter(task => task.areaId === focusArea.id);
             const isAreaSelected = isCellSelected(focusArea.id);
             const selectedTasksInArea = areaTasks.filter(task => isCellSelected(task.id));
+            const areaProgress = calculateAreaProgress(matrixData, focusArea.id);
 
             return (
               <details key={focusArea.id} className="group">
-                <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/50 active:bg-gray-100/50 transition-colors min-h-[80px] touch-manipulation">
-                  <AreaHeaderCell
-                    id={focusArea.id}
-                    focusArea={focusArea}
-                    isSelected={isAreaSelected}
-                    onClick={(event) => handleCellClick('area', focusArea.id, event)}
-                    className="flex-1 mr-3 min-h-[60px]"
-                  />
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <span>{areaTasks.length} tasks</span>
-                    <span>{selectedTasksInArea.length > 0 && `(${selectedTasksInArea.length} selected)`}</span>
-                    <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                <summary className="flex flex-col p-4 cursor-pointer hover:bg-gray-50/50 active:bg-gray-100/50 transition-colors touch-manipulation">
+                  <div className="flex items-center justify-between min-h-[80px]">
+                    <AreaHeaderCell
+                      id={focusArea.id}
+                      focusArea={focusArea}
+                      isSelected={isAreaSelected}
+                      onClick={(event) => handleCellClick('area', focusArea.id, event)}
+                      className="flex-1 mr-3 min-h-[60px]"
+                    />
+                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                      <span>{areaTasks.length} tasks</span>
+                      <span>{selectedTasksInArea.length > 0 && `(${selectedTasksInArea.length} selected)`}</span>
+                      <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {/* Progress bar for focus area */}
+                  <div className="mt-2 px-2">
+                    <AreaProgressBar
+                      completed={areaTasks.filter(t => t.status === 'completed').length}
+                      total={areaTasks.length}
+                      areaTitle=""
+                      size="sm"
+                      className="w-full"
+                    />
                   </div>
                 </summary>
 
@@ -492,10 +506,23 @@ const Grid: React.FC<GridProps> = ({
   }
 
   // Desktop layout: 9x9 grid
+  const overallProgress = calculateOverallProgress(matrixData);
+
   return (
     <div className={`relative ${className}`}>
-      {/* Zoom controls */}
-      <div className="absolute -top-12 right-0 z-20 flex items-center space-x-2">
+      {/* Progress and zoom controls */}
+      <div className="absolute -top-20 left-0 right-0 z-20 flex items-center justify-between">
+        {/* Overall progress indicator */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 min-w-[300px]">
+          <ProgressBar
+            progress={overallProgress}
+            label={`Overall Progress (${matrixData.tasks.filter(t => t.status === 'completed').length}/${matrixData.tasks.length} tasks)`}
+            size="md"
+            className="w-full"
+          />
+        </div>
+
+        {/* Zoom controls */}
         <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 flex items-center space-x-2">
           <button
             onClick={zoomOut}

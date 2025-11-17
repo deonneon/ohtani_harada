@@ -14,4 +14,33 @@ export default defineConfig({
       '@/styles': path.resolve(__dirname, './src/styles'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id: string) => {
+          // Separate heavy libraries into their own chunks for better caching
+          if (id.includes('html2canvas') || id.includes('jspdf')) {
+            return 'export-libs';
+          }
+          if (id.includes('@dnd-kit')) {
+            return 'dnd-kit';
+          }
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react-vendor';
+          }
+        },
+      },
+    },
+    // Optimize for mobile - smaller chunks
+    chunkSizeWarningLimit: 600,
+    // Enable source maps for debugging but optimize for production
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+  },
 });

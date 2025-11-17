@@ -1,6 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { Task, CreateTaskInput, TaskStatus, TaskPriority } from '../types';
 
+// Mobile detection hook
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  return isMobile;
+};
+
 interface TaskEditorProps {
   /** Whether the modal is open */
   isOpen: boolean;
@@ -32,6 +49,9 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
   const [status, setStatus] = useState<TaskStatus>(TaskStatus.PENDING);
   const [priority, setPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
   const [errors, setErrors] = useState<{title?: string; description?: string}>({});
+
+  // Mobile detection
+  const isMobile = useIsMobile();
 
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -215,37 +235,43 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="task-editor-title"
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto"
+        className={`bg-white rounded-lg shadow-xl w-full max-h-[90vh] overflow-y-auto ${
+          isMobile ? 'max-w-none mx-0' : 'max-w-lg mx-4'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className={`flex items-center justify-between border-b border-gray-200 ${
+          isMobile ? 'p-4' : 'p-6'
+        }`}>
           <h2
             id="task-editor-title"
-            className="text-xl font-semibold text-gray-900"
+            className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900`}
           >
             {task ? 'Edit Task' : 'Create New Task'}
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className={`text-gray-400 hover:text-gray-600 transition-colors ${
+              isMobile ? 'p-2' : ''
+            }`}
             aria-label="Close modal"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className={`${isMobile ? 'p-4 space-y-4' : 'p-6 space-y-6'}`}>
           {/* Title Field */}
           <div>
             <label
@@ -260,8 +286,10 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.title ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+              } ${
+                isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2'
               }`}
               placeholder="e.g., Practice hitting mechanics for 30 minutes"
               maxLength={100}
@@ -290,9 +318,11 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               id="task-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical ${
+              rows={isMobile ? 3 : 4}
+              className={`w-full border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical ${
                 errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+              } ${
+                isMobile ? 'px-4 py-3 text-base' : 'px-3 py-2'
               }`}
               placeholder="Describe what needs to be done, why it's important, and any specific requirements..."
               maxLength={300}
@@ -321,7 +351,9 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               id="task-status"
               value={status}
               onChange={(e) => setStatus(e.target.value as TaskStatus)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2'
+              }`}
             >
               {statusOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -355,7 +387,9 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               id="task-priority"
               value={priority}
               onChange={(e) => setPriority(e.target.value as TaskPriority)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2'
+              }`}
             >
               <option value={TaskPriority.LOW}>🔵 Low Priority - Nice to have</option>
               <option value={TaskPriority.MEDIUM}>🟡 Medium Priority - Should do</option>
@@ -387,18 +421,24 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
         </form>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+        <div className={`flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 rounded-b-lg ${
+          isMobile ? 'px-4 py-4 flex-col space-y-2' : 'px-6 py-4'
+        }`}>
           <button
             type="button"
             onClick={handleClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            className={`text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
+              isMobile ? 'w-full px-4 py-3 min-h-[44px]' : 'px-4 py-2'
+            }`}
           >
             Cancel
           </button>
           <button
             type="submit"
             onSubmit={handleSubmit}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              isMobile ? 'w-full px-4 py-3 min-h-[44px]' : 'px-4 py-2'
+            }`}
             disabled={!title.trim() || !description.trim()}
           >
             {task ? 'Update Task' : 'Create Task'}

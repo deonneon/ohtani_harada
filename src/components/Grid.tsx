@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { MatrixData, calculateAreaProgress, calculateOverallProgress } from '../utils';
 import GoalCell from './GoalCell';
 import AreaHeaderCell from './AreaHeaderCell';
@@ -25,24 +25,45 @@ interface GridProps {
  * Main Grid component for displaying the Harada Method 64-task matrix
  * Uses CSS Grid with 9x9 layout (81 cells total)
  */
-// Custom hook for responsive detection
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = React.useState(false);
+// Custom hook for responsive detection with more granular breakpoints
+const useResponsiveBreakpoint = () => {
+  const [breakpoint, setBreakpoint] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
   React.useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkBreakpoint = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setBreakpoint('mobile');
+      } else if (width < 1024) {
+        setBreakpoint('tablet');
+      } else {
+        setBreakpoint('desktop');
+      }
     };
 
     // Check on mount
-    checkIsMobile();
+    checkBreakpoint();
 
-    // Listen for window resize
-    window.addEventListener('resize', checkIsMobile);
-    return () => window.removeEventListener('resize', checkIsMobile);
+    // Listen for window resize with debouncing
+    let timeoutId: number;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkBreakpoint, 100) as number;
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
-  return isMobile;
+  return {
+    breakpoint,
+    isMobile: breakpoint === 'mobile',
+    isTablet: breakpoint === 'tablet',
+    isDesktop: breakpoint === 'desktop'
+  };
 };
 
 const Grid: React.FC<GridProps> = ({
@@ -63,8 +84,8 @@ const Grid: React.FC<GridProps> = ({
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 });
 
-  // Use responsive hook
-  const isMobile = useIsMobile();
+  // Use responsive breakpoint hook
+  const { breakpoint, isMobile, isTablet, isDesktop } = useResponsiveBreakpoint();
 
   // Sync external selection changes
   React.useEffect(() => {
@@ -232,14 +253,18 @@ const Grid: React.FC<GridProps> = ({
     }
   }, [isMobile]);
 
-  // Touch event handlers for mobile zoom
-  const [touchStart, setTouchStart] = React.useState<{ x: number; y: number; distance?: number } | null>(null);
+  // Touch event handlers for mobile zoom and swipe navigation
+  const [touchStart, setTouchStart] = React.useState<{ x: number; y: number; distance?: number; time?: number } | null>(null);
+  const [swipeStartArea, setSwipeStartArea] = React.useState<string | null>(null);
 
-  const handleTouchStart = React.useCallback((event: React.TouchEvent) => {
+  const handleTouchStart = React.useCallback((event: React.TouchEvent, areaId?: string) => {
     if (event.touches.length === 1) {
-      // Single touch - potential pan
+      // Single touch - potential pan or swipe
       const touch = event.touches[0];
-      setTouchStart({ x: touch.clientX, y: touch.clientY });
+      setTouchStart({ x: touch.clientX, y: touch.clientY, time: Date.now() });
+      if (areaId && isMobile) {
+        setSwipeStartArea(areaId);
+      }
     } else if (event.touches.length === 2) {
       // Two touches - pinch zoom
       const touch1 = event.touches[0];
@@ -248,9 +273,10 @@ const Grid: React.FC<GridProps> = ({
         Math.pow(touch2.clientX - touch1.clientX, 2) +
         Math.pow(touch2.clientY - touch1.clientY, 2)
       );
-      setTouchStart({ x: (touch1.clientX + touch2.clientX) / 2, y: (touch1.clientY + touch2.clientY) / 2, distance });
+      setTouchStart({ x: (touch1.clientX + touch2.clientX) / 2, y: (touch1.clientY + touch2.clientY) / 2, distance, time: Date.now() });
+      setSwipeStartArea(null); // Cancel swipe when pinching
     }
-  }, []);
+  }, [isMobile]);
 
   const handleTouchMove = React.useCallback((event: React.TouchEvent) => {
     if (!touchStart) return;
@@ -279,9 +305,44 @@ const Grid: React.FC<GridProps> = ({
     }
   }, [touchStart, zoomLevel]);
 
-  const handleTouchEnd = React.useCallback(() => {
+  const handleTouchEnd = React.useCallback((event: React.TouchEvent) => {
+    if (!touchStart || !touchStart.time) {
+      setTouchStart(null);
+      setSwipeStartArea(null);
+      return;
+    }
+
+    const touchEndTime = Date.now();
+    const touchDuration = touchEndTime - touchStart.time;
+
+    if (event.changedTouches.length === 1 && swipeStartArea && isMobile && touchDuration < 300) {
+      // Check for swipe gesture
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = touch.clientY - touchStart.y;
+      const absDeltaX = Math.abs(deltaX);
+      const absDeltaY = Math.abs(deltaY);
+
+      // Only consider horizontal swipes that are longer than vertical movement
+      if (absDeltaX > absDeltaY && absDeltaX > 50) {
+        const currentAreaIndex = matrixData.focusAreas.findIndex(area => area.id === swipeStartArea);
+        if (currentAreaIndex !== -1) {
+          const nextAreaIndex = deltaX > 0
+            ? Math.max(0, currentAreaIndex - 1) // Swipe right -> previous area
+            : Math.min(matrixData.focusAreas.length - 1, currentAreaIndex + 1); // Swipe left -> next area
+
+          if (nextAreaIndex !== currentAreaIndex) {
+            const nextArea = matrixData.focusAreas[nextAreaIndex];
+            // Simulate click on the next area to navigate
+            onCellClick?.('area', nextArea.id);
+          }
+        }
+      }
+    }
+
     setTouchStart(null);
-  }, []);
+    setSwipeStartArea(null);
+  }, [touchStart, swipeStartArea, isMobile, matrixData.focusAreas, onCellClick]);
   // Create a 9x9 grid layout
   // Center cell (4,4 in 0-based indexing) is the goal
   // Focus areas are arranged in the 8 surrounding positions
@@ -376,6 +437,8 @@ const Grid: React.FC<GridProps> = ({
         role="region"
         aria-label="Harada Method 64-task matrix - mobile view"
         tabIndex={0}
+        // Optimize touch scrolling on mobile
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {/* Mobile header with goal */}
         <div className="p-4 border-b border-gray-200/50">
@@ -398,7 +461,11 @@ const Grid: React.FC<GridProps> = ({
 
             return (
               <details key={focusArea.id} className="group">
-                <summary className="flex flex-col p-4 cursor-pointer hover:bg-gray-50/50 active:bg-gray-100/50 transition-colors touch-manipulation">
+                <summary
+                  className="flex flex-col p-4 cursor-pointer hover:bg-gray-50/50 active:bg-gray-100/50 transition-colors touch-manipulation"
+                  onTouchStart={(e) => handleTouchStart(e, focusArea.id)}
+                  onTouchEnd={handleTouchEnd}
+                >
                   <div className="flex items-center justify-between min-h-[80px]">
                     <AreaHeaderCell
                       id={focusArea.id}
@@ -427,9 +494,9 @@ const Grid: React.FC<GridProps> = ({
                   </div>
                 </summary>
 
-                {/* Tasks in this focus area */}
+                {/* Tasks in this focus area - Performance optimized for mobile */}
                 <div className="px-4 pb-4 space-y-3">
-                  {areaTasks.map((task) => (
+                  {areaTasks.slice(0, 20).map((task) => (
                     <TaskCell
                       key={task.id}
                       id={task.id}
@@ -439,6 +506,11 @@ const Grid: React.FC<GridProps> = ({
                       className="min-h-[100px] w-full touch-manipulation"
                     />
                   ))}
+                  {areaTasks.length > 20 && (
+                    <div className="text-center py-2 text-gray-500 text-sm">
+                      ... and {areaTasks.length - 20} more tasks
+                    </div>
+                  )}
                   {areaTasks.length === 0 && (
                     <div className="text-center py-4 text-gray-500 text-sm">
                       No tasks in this focus area yet
@@ -757,6 +829,13 @@ function getCellRange(startCellId: string, endCellId: string, matrixData: Matrix
   }
 
   return cells;
+}
+
+/**
+ * Get a unique cell ID for a given grid position
+ */
+function getCellId(row: number, col: number): string {
+  return `${row}-${col}`;
 }
 
 /**

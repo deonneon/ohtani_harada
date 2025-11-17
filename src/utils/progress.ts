@@ -7,12 +7,17 @@ import { MatrixData, TaskStatus, Task, FocusArea } from '../types';
 /**
  * Calculate completion percentage for a single focus area
  */
-export function calculateAreaProgress(matrixData: MatrixData, areaId: string): number {
-  const tasks = matrixData.tasks.filter(task => task.areaId === areaId);
+export function calculateAreaProgress(
+  matrixData: MatrixData,
+  areaId: string
+): number {
+  const tasks = matrixData.tasks.filter((task) => task.areaId === areaId);
 
   if (tasks.length === 0) return 0;
 
-  const completedTasks = tasks.filter(task => task.status === TaskStatus.Completed).length;
+  const completedTasks = tasks.filter(
+    (task) => task.status === TaskStatus.Completed
+  ).length;
   return Math.round((completedTasks / tasks.length) * 100);
 }
 
@@ -24,7 +29,9 @@ export function calculateOverallProgress(matrixData: MatrixData): number {
 
   if (totalTasks === 0) return 0;
 
-  const completedTasks = matrixData.tasks.filter(task => task.status === TaskStatus.Completed).length;
+  const completedTasks = matrixData.tasks.filter(
+    (task) => task.status === TaskStatus.Completed
+  ).length;
   return Math.round((completedTasks / totalTasks) * 100);
 }
 
@@ -49,21 +56,32 @@ export interface ProgressStats {
 export function getProgressStats(matrixData: MatrixData): ProgressStats {
   const tasks = matrixData.tasks;
 
-  const completed = tasks.filter(task => task.status === TaskStatus.Completed).length;
-  const inProgress = tasks.filter(task => task.status === TaskStatus.InProgress).length;
-  const pending = tasks.filter(task => task.status === TaskStatus.Pending).length;
+  const completed = tasks.filter(
+    (task) => task.status === TaskStatus.Completed
+  ).length;
+  const inProgress = tasks.filter(
+    (task) => task.status === TaskStatus.InProgress
+  ).length;
+  const pending = tasks.filter(
+    (task) => task.status === TaskStatus.Pending
+  ).length;
   const total = tasks.length;
 
-  const areaBreakdown = matrixData.focusAreas.map(area => {
-    const areaTasks = tasks.filter(task => task.areaId === area.id);
-    const areaCompleted = areaTasks.filter(task => task.status === TaskStatus.Completed).length;
+  const areaBreakdown = matrixData.focusAreas.map((area) => {
+    const areaTasks = tasks.filter((task) => task.areaId === area.id);
+    const areaCompleted = areaTasks.filter(
+      (task) => task.status === TaskStatus.Completed
+    ).length;
 
     return {
       areaId: area.id,
       areaTitle: area.title,
       completed: areaCompleted,
       total: areaTasks.length,
-      percentage: areaTasks.length > 0 ? Math.round((areaCompleted / areaTasks.length) * 100) : 0
+      percentage:
+        areaTasks.length > 0
+          ? Math.round((areaCompleted / areaTasks.length) * 100)
+          : 0,
     };
   });
 
@@ -73,14 +91,17 @@ export function getProgressStats(matrixData: MatrixData): ProgressStats {
     inProgress,
     pending,
     overallPercentage: total > 0 ? Math.round((completed / total) * 100) : 0,
-    areaBreakdown
+    areaBreakdown,
   };
 }
 
 /**
  * Check if a milestone has been reached
  */
-export function hasReachedMilestone(matrixData: MatrixData, milestone: number): boolean {
+export function hasReachedMilestone(
+  matrixData: MatrixData,
+  milestone: number
+): boolean {
   const progress = calculateOverallProgress(matrixData);
   return progress >= milestone;
 }
@@ -106,14 +127,19 @@ export function getMilestoneProgress(matrixData: MatrixData): {
     }
   }
 
-  const nextMilestone = milestones.find(m => m > currentMilestone) || 100;
-  const progressToNext = currentMilestone === 100 ? 100 :
-    Math.round(((progress - currentMilestone) / (nextMilestone - currentMilestone)) * 100);
+  const nextMilestone = milestones.find((m) => m > currentMilestone) || 100;
+  const progressToNext =
+    currentMilestone === 100
+      ? 100
+      : Math.round(
+          ((progress - currentMilestone) / (nextMilestone - currentMilestone)) *
+            100
+        );
 
   return {
     currentMilestone,
     progressToNext,
-    isComplete: progress >= 100
+    isComplete: progress >= 100,
   };
 }
 

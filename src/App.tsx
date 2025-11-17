@@ -1,5 +1,9 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { Grid, GoalEditor, FocusAreaEditor, SetupWizard, TaskEditor, BatchTaskCreator, TaskOrganizer, RecoveryDialog, StatisticsDashboard, CelebrationModal, ExportModal, TemplateSelector } from './components';
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { Grid, GoalEditor, FocusAreaEditor, SetupWizard, TaskEditor, BatchTaskCreator, TaskOrganizer, RecoveryDialog, StatisticsDashboard, CelebrationModal } from './components';
+
+// Lazy load heavy modal components for better mobile performance
+const ExportModal = lazy(() => import('./components/ExportModal').then(module => ({ default: module.default })));
+const TemplateSelector = lazy(() => import('./components/TemplateSelector').then(module => ({ default: module.default })));
 import { createEmptyMatrix, calculateOverallProgress, getMilestoneProgress } from './utils';
 import { useAutoSave, useAutoSaveIndicator } from './hooks/useAutoSave';
 import { saveMatrixData, loadMatrixData, hasMatrixData, createBackup, restoreFromBackup, getBackupMetadata, StorageError, StorageCorruptionError } from './utils/storage';
@@ -833,20 +837,24 @@ function App() {
           onClose={handleCloseBatchCreator}
         />
 
-        {/* Export Modal */}
-        <ExportModal
-          isOpen={isExportModalOpen}
-          matrixData={matrixData}
-          gridElement={gridContainerRef.current}
-          onClose={handleCloseExportModal}
-        />
+        {/* Export Modal - Lazy loaded */}
+        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"><div className="text-white">Loading...</div></div>}>
+          <ExportModal
+            isOpen={isExportModalOpen}
+            matrixData={matrixData}
+            gridElement={gridContainerRef.current}
+            onClose={handleCloseExportModal}
+          />
+        </Suspense>
 
-        {/* Template Selector Modal */}
-        <TemplateSelector
-          isOpen={isTemplateSelectorOpen}
-          onSelectTemplate={handleSelectTemplate}
-          onClose={handleCloseTemplateSelector}
-        />
+        {/* Template Selector Modal - Lazy loaded */}
+        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"><div className="text-white">Loading...</div></div>}>
+          <TemplateSelector
+            isOpen={isTemplateSelectorOpen}
+            onSelectTemplate={handleSelectTemplate}
+            onClose={handleCloseTemplateSelector}
+          />
+        </Suspense>
 
         {/* Keyboard Shortcuts Help Modal */}
         {showShortcutsHelp && (

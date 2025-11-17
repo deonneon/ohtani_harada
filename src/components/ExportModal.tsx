@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { type MatrixData } from '../types';
+import type { MatrixData } from '../types';
+import type { ExportOptions } from '../utils/export';
 import {
   exportMatrix,
-  ExportOptions,
   DEFAULT_EXPORT_OPTIONS,
 } from '../utils/export';
 

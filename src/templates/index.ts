@@ -1,9 +1,14 @@
 // Template exports for pre-configured Harada Method matrices
 
-export { sportsProfessionalAthleteTemplate } from './sports-professional-athlete';
-export { careerProfessionalDevelopmentTemplate } from './career-professional-development';
-export { educationAcademicExcellenceTemplate } from './education-academic-excellence';
-export { personalDevelopmentLifeMasteryTemplate } from './personal-development-life-mastery';
+import { sportsProfessionalAthleteTemplate } from './sports-professional-athlete';
+import { careerProfessionalDevelopmentTemplate } from './career-professional-development';
+import { educationAcademicExcellenceTemplate } from './education-academic-excellence';
+import { personalDevelopmentLifeMasteryTemplate } from './personal-development-life-mastery';
+
+export { sportsProfessionalAthleteTemplate };
+export { careerProfessionalDevelopmentTemplate };
+export { educationAcademicExcellenceTemplate };
+export { personalDevelopmentLifeMasteryTemplate };
 
 // Template metadata for UI display
 export interface TemplateMetadata {

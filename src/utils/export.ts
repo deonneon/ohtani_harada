@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import type { MatrixData } from '../types';
 import {
-  MatrixData,
   calculateOverallProgress,
   calculateAreaProgress,
 } from './progress';

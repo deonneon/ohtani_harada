@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import {
   availableTemplates,
-  TemplateMetadata,
   getTemplateById,
 } from '../templates';
-import { type MatrixData } from '../types';
+import type { MatrixData } from '../types';
+import type { TemplateMetadata } from '../templates';
 import TemplateCustomizer from './TemplateCustomizer';
 
 interface TemplateSelectorProps {

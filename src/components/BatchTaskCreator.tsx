@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { TaskStatus, TaskPriority, CreateTaskInput } from '../types';
+import { TaskStatus, TaskPriority } from '../types';
+import type { CreateTaskInput } from '../types';
 
 interface BatchTaskItem {
   id: string;

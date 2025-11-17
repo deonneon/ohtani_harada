@@ -46,7 +46,8 @@ import {
   StorageError,
   StorageCorruptionError,
 } from './utils/storage';
-import { MatrixData, CreateGoalInput, TaskStatus, TaskPriority } from './types';
+import type { MatrixData, CreateGoalInput } from './types';
+import { TaskStatus, TaskPriority } from './types';
 
 function App() {
   // Recovery dialog state
@@ -59,18 +60,23 @@ function App() {
   const [celebrationMilestone, setCelebrationMilestone] = useState(0);
   const [lastCelebratedMilestone, setLastCelebratedMilestone] = useState(0);
 
-  // Load matrix data from localStorage if available, otherwise create empty matrix
-  const [matrixData, setMatrixData] = useState<MatrixData>(() => {
+  // Initialize matrix data - will be set properly in useEffect
+  const [matrixData, setMatrixData] = useState<MatrixData>(() =>
+    createEmptyMatrix({
+      title: 'Become a Professional Baseball Player',
+      description:
+        'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills',
+    })
+  );
+
+  // Load matrix data from localStorage on component mount
+  useEffect(() => {
     try {
       const storedData = loadMatrixData();
-      return (
-        storedData ||
-        createEmptyMatrix({
-          title: 'Become a Professional Baseball Player',
-          description:
-            'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills',
-        })
-      );
+      if (storedData) {
+        setMatrixData(storedData);
+        return;
+      }
     } catch (error) {
       console.warn('Failed to load matrix data from storage:', error);
 
@@ -78,22 +84,16 @@ function App() {
       const backupData = restoreFromBackup();
       if (backupData) {
         console.info('Recovered data from backup');
-        return backupData;
+        setMatrixData(backupData);
+        return;
       }
 
       // If no backup, show recovery dialog
       setRecoveryError(error as Error);
       setCorruptedData(null); // Could extract corrupted data for manual recovery
       setIsRecoveryDialogOpen(true);
-
-      // Return empty matrix as fallback
-      return createEmptyMatrix({
-        title: 'Become a Professional Baseball Player',
-        description:
-          'Achieve excellence in baseball through systematic development of physical, mental, and strategic skills',
-      });
     }
-  });
+  }, []);
 
   const [selectedCellIds, setSelectedCellIds] = useState<string[]>([]);
 
@@ -397,6 +397,17 @@ function App() {
   const switchToOrganizerView = () => setViewMode('organizer');
   const switchToStatisticsView = () => setViewMode('statistics');
 
+  // Show keyboard shortcuts help
+  const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
+
+  const showKeyboardShortcutsHelp = () => {
+    setShowShortcutsHelp(true);
+  };
+
+  const hideKeyboardShortcutsHelp = () => {
+    setShowShortcutsHelp(false);
+  };
+
   // Keyboard shortcuts handler
   const handleKeyboardShortcuts = useCallback(
     (event: KeyboardEvent) => {
@@ -494,17 +505,6 @@ function App() {
       showKeyboardShortcutsHelp,
     ]
   );
-
-  // Show keyboard shortcuts help
-  const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
-
-  const showKeyboardShortcutsHelp = () => {
-    setShowShortcutsHelp(true);
-  };
-
-  const hideKeyboardShortcutsHelp = () => {
-    setShowShortcutsHelp(false);
-  };
 
   // Filter tasks based on current filters
   const filteredTasks = matrixData.tasks.filter((task) => {

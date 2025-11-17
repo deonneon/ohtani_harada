@@ -1,5 +1,11 @@
 import type { MatrixData, Goal, FocusArea, Task } from '../types';
 import { TaskStatus, TaskPriority } from '../types';
+import {
+  migrationEngine,
+  validateMigrationResult,
+  needsMigration,
+  createBackwardCompatibilityLayer,
+} from './migrations';
 
 /**
  * Storage schema version for handling migrations
@@ -175,14 +181,6 @@ export function deserializeMatrixData(
   if (!storedData.version) {
     throw new StorageCorruptionError('Missing version information');
   }
-
-  // Import migration engine here to avoid circular dependencies
-  const {
-    migrationEngine,
-    validateMigrationResult,
-    needsMigration,
-    createBackwardCompatibilityLayer,
-  } = require('./migrations');
 
   // Apply migrations if needed
   if (needsMigration(storedData)) {

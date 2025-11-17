@@ -1,12 +1,12 @@
-import {
+import type {
   MatrixData,
   Goal,
   FocusArea,
   Task,
-  TaskStatus,
   CreateFocusAreaInput,
   CreateTaskInput,
-} from './types';
+} from '../types';
+import { TaskStatus } from '../types';
 import { createFocusArea, createTask } from './factories';
 
 /**

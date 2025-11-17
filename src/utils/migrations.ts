@@ -1,4 +1,5 @@
-import { MatrixData, StoredMatrixData } from './types';
+import type { MatrixData } from '../types';
+import type { StoredMatrixData } from './storage';
 import { STORAGE_VERSION } from './storage';
 
 /**

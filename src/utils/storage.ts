@@ -1,4 +1,5 @@
-import { MatrixData, Goal, FocusArea, Task, TaskStatus } from './types';
+import type { MatrixData, Goal, FocusArea, Task } from '../types';
+import { TaskStatus, TaskPriority } from '../types';
 
 /**
  * Storage schema version for handling migrations
@@ -137,6 +138,7 @@ function validateStoredData(data: any): MatrixData {
       description: String(task.description || ''),
       areaId: String(task.areaId || ''),
       status: task.status as TaskStatus,
+      priority: (task.priority as TaskPriority) || TaskPriority.MEDIUM,
     };
 
     // Optional completedDate

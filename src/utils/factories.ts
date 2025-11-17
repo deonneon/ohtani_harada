@@ -1,14 +1,13 @@
-import {
+import type {
   Goal,
   FocusArea,
   Task,
   MatrixData,
-  TaskStatus,
-  TaskPriority,
   CreateGoalInput,
   CreateFocusAreaInput,
   CreateTaskInput,
-} from './types';
+} from '../types';
+import { TaskStatus, TaskPriority } from '../types';
 
 /**
  * Generates a unique ID for entities
@@ -98,6 +97,7 @@ export function createEmptyTaskMatrix(focusAreaIds: string[]): Task[] {
           description: `Task ${i} for focus area`,
           areaId,
           status: TaskStatus.PENDING,
+          priority: TaskPriority.MEDIUM,
         })
       );
     }
@@ -143,6 +143,7 @@ export function createMinimalMatrix(goalInput: CreateGoalInput): MatrixData {
       description: `A sample task to get started with ${area.title.toLowerCase()}`,
       areaId: area.id,
       status: TaskStatus.PENDING,
+      priority: TaskPriority.MEDIUM,
     })
   );
 

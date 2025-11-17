@@ -10,6 +10,15 @@ export type {
   TaskStatus,
 } from '../types';
 
+// Additional type exports from storage
+export type { StoredMatrixData } from './storage';
+
+// Additional type exports from validation
+export type { ValidationResult, ValidationError } from './validation';
+
+// Additional type exports from migrations
+export type { Migration, MigrationFunction, MigrationResult } from './migrations';
+
 // Factory function exports
 export {
   generateId,
@@ -32,7 +41,6 @@ export {
   hasMatrixData,
   getStorageMetadata,
   getStorageUsage,
-  StoredMatrixData,
   StorageError,
   StorageQuotaExceededError,
   StorageCorruptionError,
@@ -75,8 +83,6 @@ export {
   assertValidMatrix,
   sanitizeString,
   HARADA_METHOD_LIMITS,
-  ValidationResult,
-  ValidationError,
   isValidTaskStatus,
   isGoal,
   isFocusArea,
@@ -93,9 +99,6 @@ export {
   validateDataSchema,
   getMigrationMetadata,
   VersionUtils,
-  Migration,
-  MigrationFunction,
-  MigrationResult,
 } from './migrations';
 
 // Hook exports

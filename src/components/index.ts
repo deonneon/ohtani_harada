@@ -28,5 +28,4 @@ export { default as ExportModal } from './ExportModal';
 export { default as TemplateSelector } from './TemplateSelector';
 export { default as TemplateCustomizer } from './TemplateCustomizer';
 
-// Re-export cell types
-export type { CellProps } from './Cell';
+// CellProps is imported directly from Cell.tsx by components that need it

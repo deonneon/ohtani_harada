@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Base props for all cell components
  */
-export interface CellProps {
+export type CellProps = {
   /** Unique identifier for the cell */
   id: string;
   /** Whether this cell is currently selected */
@@ -14,7 +14,7 @@ export interface CellProps {
   className?: string;
   /** Content to render inside the cell */
   children: React.ReactNode;
-}
+};
 
 /**
  * Base Cell component that provides common cell functionality

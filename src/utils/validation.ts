@@ -1,13 +1,13 @@
-import {
+import type {
   Goal,
   FocusArea,
   Task,
-  TaskStatus,
   CreateGoalInput,
   CreateFocusAreaInput,
   CreateTaskInput,
   MatrixData,
-} from './types';
+} from '../types';
+import { TaskStatus } from '../types';
 
 /**
  * Validation result interface

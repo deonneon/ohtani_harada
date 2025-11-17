@@ -97,3 +97,6 @@ export {
   MigrationFunction,
   MigrationResult
 } from './migrations';
+
+// Hook exports
+export { useAutoSave, useAutoSaveIndicator } from '../hooks/useAutoSave';

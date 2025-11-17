@@ -1,4 +1,4 @@
-import { Goal, FocusArea, Task, MatrixData, TaskStatus, CreateGoalInput, CreateFocusAreaInput, CreateTaskInput } from './types';
+import { Goal, FocusArea, Task, MatrixData, TaskStatus, TaskPriority, CreateGoalInput, CreateFocusAreaInput, CreateTaskInput } from './types';
 
 /**
  * Generates a unique ID for entities
@@ -41,7 +41,8 @@ export function createTask(input: CreateTaskInput): Task {
     title: input.title,
     description: input.description,
     areaId: input.areaId,
-    status: input.status
+    status: input.status,
+    priority: input.priority || TaskPriority.MEDIUM
   };
 }
 

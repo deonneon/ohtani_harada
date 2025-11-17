@@ -13,6 +13,15 @@ export enum TaskStatus {
 }
 
 /**
+ * Priority enumeration for tasks
+ */
+export enum TaskPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high'
+}
+
+/**
  * Represents the central goal in the 64-task matrix
  */
 export interface Goal {
@@ -54,6 +63,8 @@ export interface Task {
   areaId: string;
   /** Current status of the task */
   status: TaskStatus;
+  /** Priority level of the task */
+  priority: TaskPriority;
   /** Date when the task was completed (undefined if not completed) */
   completedDate?: Date;
 }

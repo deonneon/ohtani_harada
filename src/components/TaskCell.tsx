@@ -1,5 +1,5 @@
 import React from 'react';
-import { Task, TaskStatus } from '../utils';
+import { Task, TaskStatus, TaskPriority } from '../utils';
 import Cell, { CellProps } from './Cell';
 
 /**
@@ -32,6 +32,30 @@ const STATUS_INDICATORS: Record<TaskStatus, { icon: string; color: string; label
 };
 
 /**
+ * Priority indicators for tasks
+ */
+const PRIORITY_INDICATORS: Record<TaskPriority, { icon: string; color: string; label: string; bgColor: string }> = {
+  [TaskPriority.LOW]: {
+    icon: '🔵',
+    color: 'text-blue-600',
+    label: 'Low',
+    bgColor: 'bg-blue-100'
+  },
+  [TaskPriority.MEDIUM]: {
+    icon: '🟡',
+    color: 'text-yellow-600',
+    label: 'Medium',
+    bgColor: 'bg-yellow-100'
+  },
+  [TaskPriority.HIGH]: {
+    icon: '🔴',
+    color: 'text-red-600',
+    label: 'High',
+    bgColor: 'bg-red-100'
+  }
+};
+
+/**
  * TaskCell component for displaying individual tasks in the matrix
  * Shows task status, title, and provides interaction capabilities
  */
@@ -43,6 +67,7 @@ const TaskCell: React.FC<TaskCellProps> = ({
   ...cellProps
 }) => {
   const statusInfo = STATUS_INDICATORS[task.status];
+  const priorityInfo = PRIORITY_INDICATORS[task.priority];
 
   const taskClasses = `
     bg-gradient-to-br from-amber-100 via-yellow-200 to-orange-200
@@ -66,6 +91,18 @@ const TaskCell: React.FC<TaskCellProps> = ({
       <div className="flex flex-col items-center justify-center h-full p-2 text-center relative">
         {/* Background pattern for depth */}
         <div className="absolute inset-0 bg-white/20 rounded-md"></div>
+
+        {/* Priority indicator - top right corner */}
+        <div className="absolute top-1 right-1 z-20">
+          <div
+            className={`w-4 h-4 rounded-full ${priorityInfo.bgColor} flex items-center justify-center shadow-sm`}
+            role="img"
+            aria-label={`Priority: ${priorityInfo.label}`}
+            title={`Priority: ${priorityInfo.label}`}
+          >
+            <span className="text-xs">{priorityInfo.icon}</span>
+          </div>
+        </div>
 
         {/* Status indicator with enhanced styling */}
         <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 shadow-sm mb-2 relative z-10">

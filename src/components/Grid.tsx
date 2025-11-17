@@ -217,34 +217,6 @@ const Grid: React.FC<GridProps> = ({
     [focusedCellId, matrixData, handleCellClick, updateSelection]
   );
 
-  // Add keyboard event listeners
-  React.useEffect(() => {
-    const handleGlobalKeyDown = (event: KeyboardEvent) => {
-      if (gridRef.current?.contains(event.target as Node)) {
-        handleKeyDown(event);
-      }
-    };
-
-    document.addEventListener('keydown', handleGlobalKeyDown);
-    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [handleKeyDown]);
-
-  // Check if cell is selected
-  const isCellSelected = React.useCallback(
-    (cellId: string) => {
-      return internalSelectedIds.includes(cellId);
-    },
-    [internalSelectedIds]
-  );
-
-  // Check if cell is focused
-  const isCellFocused = React.useCallback(
-    (cellId: string) => {
-      return focusedCellId === cellId;
-    },
-    [focusedCellId]
-  );
-
   // Zoom controls
   const zoomIn = React.useCallback(() => {
     setZoomLevel((prev) => Math.min(prev * 1.2, 3));
@@ -290,14 +262,63 @@ const Grid: React.FC<GridProps> = ({
   }, []);
 
   const handleWheel = React.useCallback(
-    (event: React.WheelEvent) => {
-      if (!isMobile) {
+    (event: WheelEvent) => {
+      if (!isMobile && gridRef.current?.contains(event.target as Node)) {
         event.preventDefault();
         const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
         setZoomLevel((prev) => Math.max(0.5, Math.min(3, prev * zoomFactor)));
       }
     },
     [isMobile]
+  );
+
+  // Refs to store latest event handlers to prevent infinite loops
+  const handleKeyDownRef = React.useRef<typeof handleKeyDown>();
+  const handleWheelRef = React.useRef<typeof handleWheel>();
+
+  // Update refs when handlers change
+  React.useEffect(() => {
+    handleKeyDownRef.current = handleKeyDown;
+  }, [handleKeyDown]);
+
+  React.useEffect(() => {
+    handleWheelRef.current = handleWheel;
+  }, [handleWheel]);
+
+  // Add keyboard and wheel event listeners
+  React.useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (gridRef.current?.contains(event.target as Node)) {
+        handleKeyDownRef.current?.(event);
+      }
+    };
+
+    const handleGlobalWheel = (event: WheelEvent) => {
+      handleWheelRef.current?.(event);
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    gridRef.current?.addEventListener('wheel', handleGlobalWheel, { passive: false });
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+      gridRef.current?.removeEventListener('wheel', handleGlobalWheel);
+    };
+  }, []); // Empty dependency array to prevent re-running
+
+  // Check if cell is selected
+  const isCellSelected = React.useCallback(
+    (cellId: string) => {
+      return internalSelectedIds.includes(cellId);
+    },
+    [internalSelectedIds]
+  );
+
+  // Check if cell is focused
+  const isCellFocused = React.useCallback(
+    (cellId: string) => {
+      return focusedCellId === cellId;
+    },
+    [focusedCellId]
   );
 
   // Touch event handlers for mobile zoom and swipe navigation
@@ -769,7 +790,6 @@ const Grid: React.FC<GridProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

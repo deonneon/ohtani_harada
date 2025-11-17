@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 /**
  * Configuration options for auto-save
@@ -63,7 +63,7 @@ export function useAutoSave<T>(
       console.warn('Failed to load auto-saved data:', error);
       onError?.(error as Error);
     }
-  }, [storageKey, onError]);
+  }, [storageKey]); // Removed onError from deps - should only run on mount/storageKey change
 
   // Auto-save function
   const performSave = useCallback(
@@ -91,6 +91,9 @@ export function useAutoSave<T>(
     [enabled, storageKey, onSave, onError]
   );
 
+  // Create a stable JSON representation for comparison
+  const dataJson = useMemo(() => JSON.stringify(data), [data]);
+
   // Debounced save effect
   useEffect(() => {
     if (!enabled) return;
@@ -101,14 +104,14 @@ export function useAutoSave<T>(
     }
 
     // Don't save if data hasn't changed
-    if (JSON.stringify(data) === JSON.stringify(lastDataRef.current)) {
+    if (dataJson === lastDataRef.current) {
       return;
     }
 
     // Set new timeout for auto-save
     timeoutRef.current = setTimeout(() => {
       performSave(data);
-      lastDataRef.current = data;
+      lastDataRef.current = dataJson;
     }, delay);
 
     // Cleanup timeout on unmount
@@ -117,7 +120,7 @@ export function useAutoSave<T>(
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [data, delay, enabled, performSave]);
+  }, [dataJson, delay, enabled, performSave]);
 
   // Force immediate save
   const saveNow = useCallback(async () => {
@@ -125,8 +128,8 @@ export function useAutoSave<T>(
       clearTimeout(timeoutRef.current);
     }
     await performSave(data);
-    lastDataRef.current = data;
-  }, [data, performSave]);
+    lastDataRef.current = dataJson;
+  }, [data, dataJson, performSave]);
 
   // Clear saved data
   const clearSaved = useCallback(() => {
@@ -141,7 +144,7 @@ export function useAutoSave<T>(
       console.warn('Failed to clear auto-saved data:', error);
       onError?.(error as Error);
     }
-  }, [storageKey, onError]);
+  }, [storageKey]); // Removed onError from deps to prevent unnecessary re-renders
 
   return {
     savedData,
@@ -158,25 +161,27 @@ export function useAutoSave<T>(
 export function useAutoSaveIndicator(autoSaveResult: UseAutoSaveReturn<any>) {
   const { isSaving, lastSaved } = autoSaveResult;
 
-  const getSaveStatus = () => {
-    if (isSaving) return 'saving';
-    if (lastSaved) return 'saved';
-    return 'unsaved';
-  };
+  return useMemo(() => {
+    const getSaveStatus = () => {
+      if (isSaving) return 'saving';
+      if (lastSaved) return 'saved';
+      return 'unsaved';
+    };
 
-  const getSaveStatusText = () => {
-    if (isSaving) return 'Saving...';
-    if (lastSaved) {
-      const timeAgo = getTimeAgo(lastSaved);
-      return `Saved ${timeAgo}`;
-    }
-    return 'Unsaved changes';
-  };
+    const getSaveStatusText = () => {
+      if (isSaving) return 'Saving...';
+      if (lastSaved) {
+        const timeAgo = getTimeAgo(lastSaved);
+        return `Saved ${timeAgo}`;
+      }
+      return 'Unsaved changes';
+    };
 
-  return {
-    saveStatus: getSaveStatus(),
-    saveStatusText: getSaveStatusText(),
-  };
+    return {
+      saveStatus: getSaveStatus(),
+      saveStatusText: getSaveStatusText(),
+    };
+  }, [isSaving, lastSaved]);
 }
 
 /**

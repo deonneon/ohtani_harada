@@ -138,6 +138,7 @@ function App() {
   const autoSave = useAutoSave(matrixData, {
     delay: 500, // 500ms as specified in task
     storageKey: 'ohtani-harada-matrix',
+    enabled: false, // Autosave disabled
     onSave: (data) => {
       try {
         saveMatrixData(data);

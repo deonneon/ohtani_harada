@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { type Goal, type CreateGoalInput } from '../types';
 import { useAutoSave, useAutoSaveIndicator } from '../utils';
 
@@ -29,12 +29,12 @@ export const GoalEditor: React.FC<GoalEditorProps> = ({
     description?: string;
   }>({});
 
-  // Auto-save functionality
-  const formData = { title, description };
+  // Auto-save functionality - use memoized formData to prevent infinite loops
+  const formData = useMemo(() => ({ title, description }), [title, description]);
   const autoSave = useAutoSave(formData, {
     storageKey: `goal-editor-${goal?.id || 'new'}`,
     delay: 1500, // Save after 1.5 seconds of inactivity
-    enabled: isOpen,
+    enabled: false, // Autosave disabled
   });
   const { saveStatus, saveStatusText } = useAutoSaveIndicator(autoSave);
 

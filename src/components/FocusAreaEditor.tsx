@@ -34,7 +34,7 @@ export const FocusAreaEditor: React.FC<FocusAreaEditorProps> = ({
   const autoSave = useAutoSave(areas, {
     storageKey: `focus-areas-editor-${goalId}`,
     delay: 2000, // Save after 2 seconds of inactivity
-    enabled: isOpen,
+    enabled: false, // Autosave disabled
   });
   const { saveStatus, saveStatusText } = useAutoSaveIndicator(autoSave);
 

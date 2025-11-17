@@ -1,0 +1,53 @@
+<context>
+# Overview
+Create a web application that enables users to build and manage their own "Ohtani Harada Diagram" - an interactive implementation of the Harada Method's Open Window 64 (OW64) task matrix that propelled Shohei Ohtani to baseball stardom. The app will guide users through creating a comprehensive 64-task roadmap to achieve their goals, combining the structured planning methodology with modern web technology for an accessible, visual, and engaging experience.
+
+# Core Features
+- **Interactive 64-Task Matrix Builder**: Visual grid interface where users can define 8 focus areas and populate each with 8 specific actionable tasks (64 total tasks)
+- **Goal-Centric Design**: Central goal placement with radiating focus areas, inspired by Ohtani's original chart structure
+- **Progress Tracking**: Visual completion indicators, task status management, and progress visualization
+- **Template System**: Pre-built templates for common goal categories (sports, career, education, personal development)
+- **Export Functionality**: Ability to export completed diagrams as images, PDFs, or shareable formats
+- **Mobile-Responsive Design**: Full functionality on desktop and mobile devices
+
+# User Experience
+The app will provide an intuitive, step-by-step experience that makes the powerful Harada Method accessible to everyone. Users start by defining their central goal, then work through each of the 8 focus areas, filling in specific tasks that break their ambition into concrete actions. The visual grid format makes the comprehensive planning feel manageable and rewarding, with progress tracking that celebrates completion of each task and area.
+</context>
+<PRD>
+# Technical Architecture
+- **Frontend**: React-based single-page application with TypeScript
+- **Styling**: TailwindCSS for responsive, modern UI components
+- **State Management**: React hooks with local storage for persistence
+- **Data Structure**: JSON-based task matrix with goal, areas, and tasks
+- **Export Features**: Canvas API for diagram generation, PDF libraries for document export
+- **Deployment**: Static hosting (Vercel/Netlify) with CDN for global performance
+
+# Development Roadmap
+- **Phase 1 (MVP)**: Basic 64-task matrix builder with save/load functionality
+- **Phase 2**: Progress tracking, visual completion indicators, and status management
+- **Phase 3**: Template system with pre-built examples and export capabilities
+- **Phase 4**: Advanced features like sharing, collaboration, and mobile optimization
+- **Phase 5**: Analytics dashboard and user journey enhancements
+
+# Logical Dependency Chain
+1. **Foundation**: Basic grid interface and data structure (matrix must be functional first)
+2. **Core Functionality**: Goal setting and area definition (users need to understand the structure)
+3. **Task Management**: Individual task creation and editing (core value proposition)
+4. **Persistence**: Save/load functionality (users need to preserve their work)
+5. **Progress Tracking**: Status indicators and completion visualization (motivation through progress)
+6. **Templates**: Pre-built examples and guidance (reduces friction for new users)
+7. **Export**: Sharing and documentation features (allows users to apply their plans)
+8. **Polish**: Mobile optimization and advanced UI (enhances accessibility and engagement)
+
+# Risks and Mitigations
+- **Technical Complexity**: The 64-cell matrix could be overwhelming - Mitigate with progressive disclosure, step-by-step guidance, and pre-filled examples
+- **User Adoption**: Complex methodology might intimidate users - Mitigate with clear onboarding, Ohtani's success story integration, and gradual feature introduction
+- **Data Persistence**: Users might lose work without proper saving - Mitigate with auto-save, cloud sync options, and clear save indicators
+- **Mobile Experience**: Complex grid might not work well on small screens - Mitigate with responsive design, collapsible sections, and touch-optimized interactions
+
+# Appendix
+- **Inspiration**: Shohei Ohtani's original 64-task chart from his high school days
+- **Methodology**: Harada Method's Open Window 64 framework for comprehensive goal planning
+- **Target Users**: Ambitious individuals seeking structured approaches to personal and professional development
+- **Success Metrics**: User engagement with task completion, return usage, and goal achievement rates
+</PRD>

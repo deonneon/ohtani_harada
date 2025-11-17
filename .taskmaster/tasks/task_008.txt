@@ -1,0 +1,31 @@
+# Task ID: 8
+# Title: Create Template System with Pre-built Examples
+# Status: pending
+# Dependencies: 4, 5
+# Priority: medium
+# Description: Build template functionality with pre-configured 64-task matrices for common goal categories (sports, career, education, personal development).
+# Details:
+Create template data files for each category with pre-filled goals, focus areas, and tasks. Implement Template Selector UI allowing users to browse and preview templates. Add template customization before applying. Implement template import that merges with existing matrix or creates new one. Add template creation wizard for advanced users. Include tutorial content linked to templates.
+
+# Test Strategy:
+Test loading each template type, verify templates contain 64 tasks, test template preview, confirm customization works, test template import to new/existing matrices, verify guidance content displays.
+
+# Subtasks:
+## 1. Create template data files for different categories [pending]
+### Dependencies: None
+### Description: Build pre-configured templates for sports, career, education, and personal development
+### Details:
+Create JSON template files for each category with pre-filled goals, focus areas, and 64 tasks. Include variety of examples covering different life domains. Add metadata and descriptions for each template.
+
+## 2. Implement Template Selector UI and preview [pending]
+### Dependencies: None
+### Description: Create interface for browsing and previewing available templates
+### Details:
+Build TemplateSelector component with grid layout showing template cards. Add preview functionality showing goal, areas, and sample tasks. Include search and filtering by category. Add template descriptions and difficulty levels.
+
+## 3. Add template customization and import functionality [pending]
+### Dependencies: None
+### Description: Implement template editing and import/merge capabilities
+### Details:
+Create template customization interface allowing users to modify goals and areas before applying. Implement template import that can merge with existing matrices or create new ones. Add validation to ensure 64-task structure is maintained.
+

@@ -1,0 +1,49 @@
+# Task ID: 4
+# Title: Implement Goal Setting and Focus Area Definition
+# Status: pending
+# Dependencies: 2, 3
+# Priority: high
+# Description: Create UI and logic for users to set their central goal and define the 8 focus areas that support it.
+# Details:
+Build Goal Editor modal/form component with title, description, and optional image upload. Implement FocusArea Editor for defining 8 areas with names and descriptions. Add step-by-step wizard flow guiding users through goal and area setup. Include input validation and character limits. Implement auto-save to localStorage. Add guidance text explaining the Harada Method structure. Create confirmation steps before proceeding.
+
+# Test Strategy:
+Test goal creation and validation, verify 8 focus areas can be created/edited/deleted, confirm data persists to localStorage, test form validation with invalid inputs, verify wizard flow navigation.
+
+# Subtasks:
+## 1. Create Goal Editor modal component [pending]
+### Dependencies: None
+### Description: Build modal form for setting the central goal with title and description
+### Details:
+Create GoalEditor.tsx component with modal overlay. Implement form fields for goal title and description. Add image upload capability for goal visualization. Include proper form validation and accessibility features.
+
+## 2. Implement FocusArea Editor component [pending]
+### Dependencies: None
+### Description: Create editor for defining the 8 focus areas with names and descriptions
+### Details:
+Build FocusAreaEditor.tsx component for managing 8 focus areas. Implement individual editors for each area with title and description fields. Add validation to ensure exactly 8 areas are defined. Include drag-and-drop reordering if needed.
+
+## 3. Build step-by-step wizard flow [pending]
+### Dependencies: None
+### Description: Create guided wizard interface for goal and area setup
+### Details:
+Implement multi-step wizard with progress indicators. Create step navigation with back/next buttons. Include validation at each step before proceeding. Add ability to save progress and resume later.
+
+## 4. Add input validation and character limits [pending]
+### Dependencies: None
+### Description: Implement validation rules for all form inputs
+### Details:
+Add validation for required fields, character limits, and input formats. Implement real-time validation feedback. Add proper error messages and field highlighting. Include validation for the 8-area requirement.
+
+## 5. Implement auto-save for form data [pending]
+### Dependencies: None
+### Description: Add auto-save functionality to prevent data loss during editing
+### Details:
+Implement debounced auto-save on form changes. Add visual save indicators. Store draft data in localStorage. Include recovery mechanism for unsaved changes on page reload.
+
+## 6. Add guidance text and contextual help [pending]
+### Dependencies: None
+### Description: Include helpful text explaining the Harada Method structure
+### Details:
+Add tooltips and guidance text explaining each step. Include examples of good goals and focus areas. Add references to Ohtani's success story. Create contextual help that appears based on user progress.
+

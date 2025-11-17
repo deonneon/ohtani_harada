@@ -1,0 +1,544 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup React TypeScript Project with TailwindCSS",
+        "description": "Initialize a React SPA with TypeScript support and configure TailwindCSS for styling. This establishes the foundation for the entire application.",
+        "details": "Create React app using create-react-app or Vite with TypeScript template. Install and configure TailwindCSS following latest documentation. Setup tsconfig.json with strict mode enabled. Configure ESLint and Prettier for code quality. Ensure build process is optimized for static hosting (Vercel/Netlify). Create basic project structure with src/components, src/pages, src/utils, and src/styles directories.",
+        "testStrategy": "Verify TypeScript compilation succeeds with no errors, TailwindCSS classes apply correctly to test component, build process completes and generates optimized bundle, and static hosting requirements are met.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize React TypeScript project with Vite",
+            "description": "Create a new React project with TypeScript support using Vite as the build tool",
+            "details": "Use Vite to create a new React TypeScript project. Run 'npm create vite@latest .' with React and TypeScript template. Install dependencies and verify the project builds successfully.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 2,
+            "title": "Install and configure TailwindCSS",
+            "description": "Install TailwindCSS and configure it for the React project",
+            "details": "Install TailwindCSS and its dependencies. Configure tailwind.config.js with proper content paths. Add Tailwind directives to the main CSS file. Verify Tailwind classes work in components.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 3,
+            "title": "Setup project directory structure",
+            "description": "Create organized directory structure for components, pages, utils, and styles",
+            "details": "Create src/components, src/pages, src/utils, and src/styles directories. Set up basic file organization following React best practices. Create index files for clean imports.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 4,
+            "title": "Configure ESLint and Prettier",
+            "description": "Setup code quality tools for consistent formatting and error checking",
+            "details": "Install and configure ESLint with TypeScript and React rules. Setup Prettier for code formatting. Create configuration files and add npm scripts for linting and formatting.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 5,
+            "title": "Configure TypeScript strict mode and paths",
+            "description": "Setup TypeScript configuration for strict type checking and path aliases",
+            "details": "Configure tsconfig.json with strict mode enabled. Setup path aliases for clean imports. Configure build settings for static hosting compatibility.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Design and Implement Core Data Structure",
+        "description": "Define JSON-based data model for the 64-task matrix including goal, 8 focus areas, and 64 tasks with metadata and status tracking.",
+        "details": "Create TypeScript interfaces: Goal (id, title, description, createdDate), FocusArea (id, title, description, goalId), Task (id, title, description, areaId, status, completedDate). Implement factory functions for creating new matrices. Design localStorage schema for persistence. Create utility functions for CRUD operations on the matrix structure. Include versioning for future migrations.",
+        "testStrategy": "Unit tests for creating new matrices, adding/editing/deleting areas and tasks, data validation, and localStorage serialization/deserialization. Verify data structure maintains referential integrity.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create TypeScript interfaces for data models",
+            "description": "Define TypeScript interfaces for Goal, FocusArea, and Task entities",
+            "details": "Create interfaces for Goal (id, title, description, createdDate), FocusArea (id, title, description, goalId), and Task (id, title, description, areaId, status, completedDate). Include proper typing for all properties and relationships.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 2,
+            "title": "Implement factory functions for matrix creation",
+            "description": "Create functions to generate new matrices with default structures",
+            "details": "Implement factory functions for creating new Goal objects, FocusArea arrays, and empty task matrices. Include default values and proper initialization of all required properties.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 3,
+            "title": "Design localStorage schema and persistence utilities",
+            "description": "Create schema for storing matrix data in browser localStorage",
+            "details": "Design JSON schema for localStorage persistence. Create utility functions for serialization/deserialization. Implement error handling for storage quota limits and data corruption.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 4,
+            "title": "Create CRUD utility functions",
+            "description": "Implement functions for Create, Read, Update, Delete operations on matrix data",
+            "details": "Create utility functions for adding/removing/updating goals, focus areas, and tasks. Implement search and filtering capabilities. Ensure referential integrity is maintained across all operations.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 5,
+            "title": "Add data validation and error handling",
+            "description": "Implement validation logic and error handling for data integrity",
+            "details": "Create validation functions for all data models. Implement error handling for invalid data states. Add type guards and runtime validation to prevent data corruption.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 6,
+            "title": "Implement versioning system for migrations",
+            "description": "Create system for handling future data structure changes",
+            "details": "Implement versioning in the data schema. Create migration functions for upgrading old data formats. Add backward compatibility for data loading and forward compatibility for saving.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Build Interactive 64-Task Matrix Grid UI Component",
+        "description": "Create the visual 8x8 grid interface displaying the matrix layout with goal at center and focus areas radiating outward.",
+        "details": "Build Grid component using React with CSS Grid layout (8x8). Implement cell components for goal and task display. Add visual styling to distinguish goal cell, area headers, and task cells. Implement click handlers for cell selection and editing. Add responsive design considerations for desktop view. Create zoom/pan capabilities if needed. Use TailwindCSS for styling with custom grid configuration.",
+        "testStrategy": "Render grid with correct cell count (64 + 1 goal), verify cell click events trigger correctly, check responsive behavior on desktop, confirm grid scales properly with content, test keyboard navigation if implemented.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create main Grid component with CSS Grid layout",
+            "description": "Build the core 8x8 grid component using CSS Grid",
+            "details": "Create Grid.tsx component using CSS Grid layout (8x8). Implement proper grid structure with 64 cells plus center goal cell. Set up grid positioning and sizing for desktop view.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 2,
+            "title": "Implement cell components for different content types",
+            "description": "Create reusable cell components for goal, area headers, and tasks",
+            "details": "Build Cell.tsx, GoalCell.tsx, AreaHeaderCell.tsx, and TaskCell.tsx components. Implement different layouts and styling for each cell type. Add proper content rendering for each cell type.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 3,
+            "title": "Add visual styling and cell differentiation",
+            "description": "Implement distinct visual styles for different cell types",
+            "details": "Use TailwindCSS to create distinct visual styling for goal cell, area headers, and task cells. Implement color coding, borders, and typography differences. Add hover states and visual hierarchy.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 4,
+            "title": "Implement cell interaction and selection handlers",
+            "description": "Add click handlers and selection state management for cells",
+            "details": "Implement onClick handlers for cell selection. Add selection state management with React hooks. Implement keyboard navigation support. Add visual feedback for selected cells.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 5,
+            "title": "Add responsive design considerations",
+            "description": "Implement responsive behavior for different screen sizes",
+            "details": "Add TailwindCSS responsive utilities for different breakpoints. Implement mobile-specific grid layouts. Add responsive font sizes and spacing. Test grid behavior on various screen sizes.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 6,
+            "title": "Implement zoom and pan capabilities",
+            "description": "Add zoom controls and pan functionality for large matrices",
+            "details": "Implement zoom in/out controls with mouse wheel support. Add pan functionality for navigating large grids. Maintain grid proportions during zoom. Add zoom level indicators.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 3
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Implement Goal Setting and Focus Area Definition",
+        "description": "Create UI and logic for users to set their central goal and define the 8 focus areas that support it.",
+        "details": "Build Goal Editor modal/form component with title, description, and optional image upload. Implement FocusArea Editor for defining 8 areas with names and descriptions. Add step-by-step wizard flow guiding users through goal and area setup. Include input validation and character limits. Implement auto-save to localStorage. Add guidance text explaining the Harada Method structure. Create confirmation steps before proceeding.",
+        "testStrategy": "Test goal creation and validation, verify 8 focus areas can be created/edited/deleted, confirm data persists to localStorage, test form validation with invalid inputs, verify wizard flow navigation.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Goal Editor modal component",
+            "description": "Build modal form for setting the central goal with title and description",
+            "details": "Create GoalEditor.tsx component with modal overlay. Implement form fields for goal title and description. Add image upload capability for goal visualization. Include proper form validation and accessibility features.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 2,
+            "title": "Implement FocusArea Editor component",
+            "description": "Create editor for defining the 8 focus areas with names and descriptions",
+            "details": "Build FocusAreaEditor.tsx component for managing 8 focus areas. Implement individual editors for each area with title and description fields. Add validation to ensure exactly 8 areas are defined. Include drag-and-drop reordering if needed.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 3,
+            "title": "Build step-by-step wizard flow",
+            "description": "Create guided wizard interface for goal and area setup",
+            "details": "Implement multi-step wizard with progress indicators. Create step navigation with back/next buttons. Include validation at each step before proceeding. Add ability to save progress and resume later.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 4,
+            "title": "Add input validation and character limits",
+            "description": "Implement validation rules for all form inputs",
+            "details": "Add validation for required fields, character limits, and input formats. Implement real-time validation feedback. Add proper error messages and field highlighting. Include validation for the 8-area requirement.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 5,
+            "title": "Implement auto-save for form data",
+            "description": "Add auto-save functionality to prevent data loss during editing",
+            "details": "Implement debounced auto-save on form changes. Add visual save indicators. Store draft data in localStorage. Include recovery mechanism for unsaved changes on page reload.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 6,
+            "title": "Add guidance text and contextual help",
+            "description": "Include helpful text explaining the Harada Method structure",
+            "details": "Add tooltips and guidance text explaining each step. Include examples of good goals and focus areas. Add references to Ohtani's success story. Create contextual help that appears based on user progress.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Develop Task Creation and Editing Interface",
+        "description": "Build the core task management interface allowing users to create, edit, and organize 64 individual tasks across focus areas.",
+        "details": "Implement Task Editor component with inline editing and modal forms. Create batch task entry mode for quick task creation. Add drag-and-drop reordering within focus areas. Implement task templates with suggested actions. Add character limits and validation for task descriptions. Support task status management (not started, in progress, completed). Implement priority/difficulty indicators. Create keyboard shortcuts for power users.",
+        "testStrategy": "Test creating tasks within each focus area, verify inline and modal editing works, test drag-and-drop reordering, confirm task validation, verify task count reaches 64, test all status transitions.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Task Editor components",
+            "description": "Build inline editing and modal form components for task management",
+            "details": "Implement TaskEditor.tsx with both inline editing and modal form modes. Create form fields for title, description, status, and priority. Add proper validation and accessibility features.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 2,
+            "title": "Implement batch task entry and quick creation",
+            "description": "Add functionality for creating multiple tasks efficiently",
+            "details": "Create batch entry mode for quick task creation. Implement template-based task suggestions. Add bulk operations for setting status or priority across multiple tasks.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 3,
+            "title": "Add drag-and-drop reordering and organization",
+            "description": "Implement drag-and-drop functionality for task organization",
+            "details": "Add drag-and-drop library integration for reordering tasks within focus areas. Implement visual feedback during dragging. Add keyboard-based reordering as alternative.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 4,
+            "title": "Implement task status management and priority indicators",
+            "description": "Add status tracking and priority visualization for tasks",
+            "details": "Implement status dropdown with pending/in-progress/completed states. Add priority indicators (high/medium/low). Create visual status indicators and progress tracking. Add filtering by status and priority.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 5,
+            "title": "Add keyboard shortcuts and accessibility features",
+            "description": "Implement keyboard navigation and accessibility enhancements",
+            "details": "Add keyboard shortcuts for common actions (create task, edit, delete). Implement full keyboard navigation. Add ARIA labels and screen reader support. Ensure all interactions work without mouse.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 5
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Implement Auto-Save and LocalStorage Persistence",
+        "description": "Build robust auto-save functionality with localStorage persistence to prevent data loss and ensure seamless user experience.",
+        "details": "Implement debounced auto-save function triggered on data changes (500ms delay). Add localStorage wrapper with error handling and quota management. Create save indicator UI showing save status (syncing/saved/error). Implement versioning system for data migrations. Add recovery mechanism for corrupted data. Create backup/restore functionality. Add timestamp tracking for saves. Implement optional cloud sync preparation (localStorage initially).",
+        "testStrategy": "Verify auto-save triggers on matrix changes, test localStorage quota handling, confirm data persists across page reloads, test recovery from corrupted data, verify save indicator displays correctly, test with large matrices.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement debounced auto-save functionality",
+            "description": "Create auto-save system with debouncing to prevent excessive saves",
+            "details": "Implement useAutoSave hook with 500ms debounce. Trigger saves on data changes. Add error handling for failed saves. Include save status tracking.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 2,
+            "title": "Create localStorage wrapper with error handling",
+            "description": "Build robust localStorage utilities with quota and error management",
+            "details": "Create storage utilities with try/catch blocks. Handle quota exceeded errors. Implement graceful degradation when storage fails. Add data compression if needed.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 3,
+            "title": "Add save indicator UI and recovery mechanisms",
+            "description": "Create visual feedback for save status and data recovery features",
+            "details": "Implement save status indicator (syncing/saved/error). Add recovery UI for corrupted data. Create backup/restore functionality. Add timestamp tracking for saves.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 6
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Build Progress Tracking and Completion Visualization",
+        "description": "Create visual progress indicators and completion tracking system showing task completion status and overall progress statistics.",
+        "details": "Implement progress bar showing completion percentage per focus area and overall. Add visual indicators (checkmarks, colors) for task status. Create statistics dashboard showing tasks completed, in progress, pending. Implement filtering by status. Add progress history visualization. Create goal achievement celebration UI. Implement milestones (25%, 50%, 75%, 100% completion). Add streak counter for consistent work.",
+        "testStrategy": "Test progress calculations with various completion states, verify visual indicators update correctly, test filtering by status, confirm statistics are accurate, test milestone triggers, verify celebration UI appears appropriately.",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement progress bars and completion indicators",
+            "description": "Create visual progress bars for areas and overall completion",
+            "details": "Build progress bar components showing completion percentage per focus area and overall. Add visual indicators (checkmarks, colors) for task status. Implement milestone markers (25%, 50%, 75%, 100%).",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 7
+          },
+          {
+            "id": 2,
+            "title": "Create statistics dashboard and filtering",
+            "description": "Build comprehensive statistics view with filtering capabilities",
+            "details": "Implement statistics dashboard showing tasks completed, in progress, pending. Add filtering by status and focus area. Create progress history visualization with charts. Add streak counter for consistent work.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 7
+          },
+          {
+            "id": 3,
+            "title": "Add goal achievement celebration and notifications",
+            "description": "Implement celebration UI and achievement notifications",
+            "details": "Create goal achievement celebration UI with animations. Add milestone completion notifications. Implement progress-based motivational messages. Add achievement badges or certificates.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 7
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Create Template System with Pre-built Examples",
+        "description": "Build template functionality with pre-configured 64-task matrices for common goal categories (sports, career, education, personal development).",
+        "details": "Create template data files for each category with pre-filled goals, focus areas, and tasks. Implement Template Selector UI allowing users to browse and preview templates. Add template customization before applying. Implement template import that merges with existing matrix or creates new one. Add template creation wizard for advanced users. Include tutorial content linked to templates.",
+        "testStrategy": "Test loading each template type, verify templates contain 64 tasks, test template preview, confirm customization works, test template import to new/existing matrices, verify guidance content displays.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create template data files for different categories",
+            "description": "Build pre-configured templates for sports, career, education, and personal development",
+            "details": "Create JSON template files for each category with pre-filled goals, focus areas, and 64 tasks. Include variety of examples covering different life domains. Add metadata and descriptions for each template.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 2,
+            "title": "Implement Template Selector UI and preview",
+            "description": "Create interface for browsing and previewing available templates",
+            "details": "Build TemplateSelector component with grid layout showing template cards. Add preview functionality showing goal, areas, and sample tasks. Include search and filtering by category. Add template descriptions and difficulty levels.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 3,
+            "title": "Add template customization and import functionality",
+            "description": "Implement template editing and import/merge capabilities",
+            "details": "Create template customization interface allowing users to modify goals and areas before applying. Implement template import that can merge with existing matrices or create new ones. Add validation to ensure 64-task structure is maintained.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 8
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Implement Export Functionality (Image and PDF)",
+        "description": "Add export capabilities allowing users to download their completed diagrams as images (PNG/JPEG) or PDF documents for sharing and external use.",
+        "details": "Implement Canvas API-based image export generating PNG/JPEG of the matrix. Integrate PDF library (jsPDF or similar) for formatted PDF export. Add export options: full matrix, summary report, focused areas only, completed tasks only. Implement download triggering. Add customization options for exported format (title, date, footer). Create shareable link generation (future cloud feature prep). Add print-to-PDF browser functionality.",
+        "testStrategy": "Test image export generates correct format and includes all matrix content, test PDF export with various options, verify downloaded files are valid, test export with large task descriptions, confirm file naming is appropriate, test print functionality.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Canvas API image export",
+            "description": "Create image export functionality using Canvas API",
+            "details": "Implement Canvas rendering of the matrix grid. Add PNG/JPEG export options. Create high-quality rendering with proper text and styling. Handle large matrix rendering efficiently.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          },
+          {
+            "id": 2,
+            "title": "Integrate PDF export with jsPDF",
+            "description": "Add PDF generation and export capabilities",
+            "details": "Integrate jsPDF or similar PDF library. Create formatted PDF layouts with matrix, summary, and report options. Add customization options for PDF format and content. Implement download triggering.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          },
+          {
+            "id": 3,
+            "title": "Add export options and customization UI",
+            "description": "Create export settings and options interface",
+            "details": "Build export options modal with format selection, content filtering, and customization. Add title, date, and footer options. Implement shareable link generation. Add print-to-PDF browser functionality.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Optimize for Mobile and Responsive Design",
+        "description": "Ensure full functionality and optimal user experience on mobile devices with responsive design and touch-optimized interactions.",
+        "details": "Implement mobile-first breakpoints using TailwindCSS responsive utilities. Create collapsible focus area sections for small screens. Implement touch-friendly larger tap targets (min 44x44px). Add swipe navigation between focus areas on mobile. Implement vertical scrolling matrix view for small screens instead of full grid. Add mobile-specific editing interfaces. Test on actual devices (iOS/Android). Optimize font sizes and spacing for mobile. Implement orientation change handling.",
+        "testStrategy": "Test on mobile devices (iOS/Android) and emulators, verify all features accessible on small screens, test touch interactions and swipe navigation, verify text readability on all screen sizes, test form input on mobile keyboards, confirm export works on mobile, test performance on slow connections.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          5,
+          6,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement mobile-first responsive design",
+            "description": "Create responsive layouts optimized for mobile devices",
+            "details": "Add TailwindCSS responsive utilities for breakpoints. Implement collapsible focus area sections for small screens. Create vertical scrolling matrix view for mobile. Optimize font sizes and spacing for touch interfaces.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          },
+          {
+            "id": 2,
+            "title": "Add touch-optimized interactions and swipe navigation",
+            "description": "Implement touch-friendly gestures and mobile navigation",
+            "details": "Add touch-friendly tap targets (min 44x44px). Implement swipe navigation between focus areas. Add touch gesture support for drag-and-drop. Create mobile-specific editing interfaces with larger inputs.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          },
+          {
+            "id": 3,
+            "title": "Test and optimize performance on mobile devices",
+            "description": "Ensure optimal performance and usability on actual mobile devices",
+            "details": "Test on iOS/Android devices and emulators. Optimize bundle size for mobile networks. Implement lazy loading for large matrices. Add mobile-specific performance optimizations. Verify all features work on touch interfaces.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-11-17T20:11:44.381Z",
+      "updated": "2025-11-17T20:22:49.908Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

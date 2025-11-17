@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Grid, GoalEditor, FocusAreaEditor, SetupWizard, TaskEditor, BatchTaskCreator, TaskOrganizer, RecoveryDialog, StatisticsDashboard, CelebrationModal } from './components';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { Grid, GoalEditor, FocusAreaEditor, SetupWizard, TaskEditor, BatchTaskCreator, TaskOrganizer, RecoveryDialog, StatisticsDashboard, CelebrationModal, ExportModal, TemplateSelector } from './components';
 import { createEmptyMatrix, calculateOverallProgress, getMilestoneProgress } from './utils';
 import { useAutoSave, useAutoSaveIndicator } from './hooks/useAutoSave';
 import { saveMatrixData, loadMatrixData, hasMatrixData, createBackup, restoreFromBackup, getBackupMetadata, StorageError, StorageCorruptionError } from './utils/storage';
@@ -49,6 +49,9 @@ function App() {
 
   const [selectedCellIds, setSelectedCellIds] = useState<string[]>([]);
 
+  // Grid container ref for export functionality
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+
   // Goal editor modal state
   const [isGoalEditorOpen, setIsGoalEditorOpen] = useState(false);
 
@@ -64,6 +67,12 @@ function App() {
 
   // Batch task creator modal state
   const [isBatchCreatorOpen, setIsBatchCreatorOpen] = useState(false);
+
+  // Export modal state
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // Template selector modal state
+  const [isTemplateSelectorOpen, setIsTemplateSelectorOpen] = useState(false);
 
   // Task filtering state
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -295,6 +304,29 @@ function App() {
     }));
   };
 
+  // Export modal handlers
+  const handleOpenExportModal = () => {
+    setIsExportModalOpen(true);
+  };
+
+  const handleCloseExportModal = () => {
+    setIsExportModalOpen(false);
+  };
+
+  // Template selector handlers
+  const handleOpenTemplateSelector = () => {
+    setIsTemplateSelectorOpen(true);
+  };
+
+  const handleCloseTemplateSelector = () => {
+    setIsTemplateSelectorOpen(false);
+  };
+
+  const handleSelectTemplate = (templateData: MatrixData) => {
+    setMatrixData(templateData);
+    setIsTemplateSelectorOpen(false);
+  };
+
   // Task reordering handler
   const handleTaskReorder = (reorderedTasks: any[]) => {
     setMatrixData(prevData => ({
@@ -498,6 +530,20 @@ function App() {
               >
                 Batch Create
               </button>
+              <button
+                onClick={handleOpenTemplateSelector}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors text-sm font-medium"
+                aria-label="Choose template"
+              >
+                📋 Templates
+              </button>
+              <button
+                onClick={handleOpenExportModal}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-sm font-medium"
+                aria-label="Export matrix"
+              >
+                📤 Export
+              </button>
               <div className="flex border border-gray-300 rounded-md">
                 <button
                   onClick={switchToGridView}
@@ -642,12 +688,14 @@ function App() {
 
           <div className="flex justify-center">
             {viewMode === 'grid' ? (
-              <Grid
-                matrixData={filteredMatrixData}
-                onCellClick={handleCellClick}
-                onSelectionChange={handleSelectionChange}
-                selectedCellIds={selectedCellIds}
-              />
+              <div ref={gridContainerRef}>
+                <Grid
+                  matrixData={filteredMatrixData}
+                  onCellClick={handleCellClick}
+                  onSelectionChange={handleSelectionChange}
+                  selectedCellIds={selectedCellIds}
+                />
+              </div>
             ) : viewMode === 'organizer' ? (
               <div className="w-full max-w-4xl">
                 <TaskOrganizer
@@ -783,6 +831,21 @@ function App() {
           focusAreaIds={matrixData.focusAreas.map(area => area.id)}
           onCreate={handleCreateBatchTasks}
           onClose={handleCloseBatchCreator}
+        />
+
+        {/* Export Modal */}
+        <ExportModal
+          isOpen={isExportModalOpen}
+          matrixData={matrixData}
+          gridElement={gridContainerRef.current}
+          onClose={handleCloseExportModal}
+        />
+
+        {/* Template Selector Modal */}
+        <TemplateSelector
+          isOpen={isTemplateSelectorOpen}
+          onSelectTemplate={handleSelectTemplate}
+          onClose={handleCloseTemplateSelector}
         />
 
         {/* Keyboard Shortcuts Help Modal */}
